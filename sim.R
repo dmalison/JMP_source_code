@@ -1,8 +1,8 @@
 # Prologue ----------------------------------------------------------------
 
-setwd("~/bin/R/FragileFamilies/CurrentVersion")
+setwd("~/bin/R/JMP/JMP_source_code")
 rm(list = ls())
-load("ME_RE_fit_v4_1")
+load("~/bin/R/JMP/work/fit")
 
 library("rstan")       # used to sample from posterior using MCMC
 library("foreign")     # used to import data from Stata
@@ -399,7 +399,7 @@ rm(list = c(names(stan_data), names(parTrue)))
 # Fit model with stan -----------------------------------------------------
 
 fit_stan = stan(
-  file = 'ME_RE_v4.stan',
+  file = 'model.stan',
   data = stan_data,
   pars = c(parNames,
            #           "lambda",
@@ -407,13 +407,13 @@ fit_stan = stan(
            #           "theta_1", "theta_2", "theta_3", "theta_4"
   ),
   include = T,
-  chains = 8,
-  iter = 750,
-  warmup = 500,
-  refresh = 10,
+  chains = 1,
+  iter = 10,
+  warmup = 5,
+  refresh = 1,
   init_r = .5,
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
 
-save(list = c("stan_data", "fit_stan", "parNames", "parTrue"), file = 'ME_RE_sim_v4')
+save(list = c("stan_data", "fit_stan", "parNames", "parTrue"), file = "~/bin/R/JMP/work/sim")
 

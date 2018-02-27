@@ -2,7 +2,7 @@
 
 # Prologue ----------------------------------------------------------------
 
-setwd("~/bin/R/FragileFamilies/CurrentVersion")
+setwd("~/bin/R/JMP/JMP_source_code")
 rm(list = ls())
 
 library("rstan")       # used to sample from posterior using MCMC
@@ -430,7 +430,7 @@ rm(list = c(names(stan_data), names(parNames)))
 # Fit model with stan -----------------------------------------------------
 
 fit_stan = stan(
-  file = 'ME_RE_v4.stan',
+  file = 'model.stan',
   data = stan_data,
   pars = c(parNames,
 #           "lambda",
@@ -446,6 +446,6 @@ fit_stan = stan(
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
 
-save(list = c("stan_data", "fit_stan", "parNames"), file = 'ME_RE_fit_v4_1')
+save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/R/JMP/work/fit")
 
 
