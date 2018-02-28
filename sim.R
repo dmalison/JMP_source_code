@@ -1,8 +1,19 @@
+<<<<<<< Updated upstream
 # Prologue ----------------------------------------------------------------
 
 setwd("~/bin/R/JMP/JMP_source_code")
 rm(list = ls())
 load("~/bin/R/JMP/work/fit")
+=======
+# Estimates model parameters using simulated data
+# Parameter values chosen to match posterior means from fit
+
+# Prologue ----------------------------------------------------------------
+
+setwd("~/bin/JMP/JMP_source_code")
+rm(list = ls())
+load("~/bin/JMP/work/fit")
+>>>>>>> Stashed changes
 
 library("rstan")       # used to sample from posterior using MCMC
 library("foreign")     # used to import data from Stata
@@ -16,7 +27,11 @@ options(mc.cores = parallel::detectCores())
 
 # Create simulated data frame ---------------------------------------------------------------
 
+<<<<<<< Updated upstream
 N = 5000             # number of observations for simulated data set
+=======
+N = 10000             # number of observations for simulated data set
+>>>>>>> Stashed changes
 
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
 
@@ -63,6 +78,12 @@ X <- matrix(as.numeric(X), nrow = dim(X)[1], ncol = dim(X)[2], dimnames = list(N
 # Turn X into numeric matrix to make it easier to analyze and load into stan
 X_num <- ncol(X)
 
+<<<<<<< Updated upstream
+=======
+R_0 <- data_raw$R_0
+
+
+>>>>>>> Stashed changes
 # Extract parameters from fit_stan -----------------------------------------
 
 for (i in parNames){
@@ -88,6 +109,19 @@ colnames(theta_0) <- "R"
 
 rm(theta_R_0)
 
+<<<<<<< Updated upstream
+=======
+R_1 <- 
+  (
+    (
+      X %*% alpha_p[,1] + 
+        gamma_p_[1,1] * theta_0[,1] +
+        gamma_p_[2,1] * theta_0[,1]^2 - 
+        rnorm(N)
+    ) > 0
+  )*R_0
+
+>>>>>>> Stashed changes
 # Simulate measurements ---------------------------------------------------
 
 variable <- "R" # latent variable
@@ -218,7 +252,10 @@ for (i in 1:nrow(M_frame)){
   
 }
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 M_prior <- function(variable, period, n_cat) {
   
   # Constructs prior parameters for ordered logits using measurement averages as proxies
@@ -304,6 +341,32 @@ R_0_N1 = sum(R_0 == 1, na.rm = T)
 R_0_ind0 = which(R_0 == 0)
 R_0_N0 = sum(R_0 == 0, na.rm = T)
 
+<<<<<<< Updated upstream
+=======
+for (i in 1:1){
+  
+  # create local names
+  
+  R_name = paste("R",i,sep = "_")
+  R = data_raw[[R_name]]
+  
+  Rm1_name = paste("R",i-1,sep = "_")
+  Rm1 = data_raw[[Rm1_name]]
+  
+  assign(paste(R_name, "ind", sep = "_"), which(!is.na(R) & Rm1 == 1))
+  assign(paste(R_name, "N", sep = "_"), sum(!is.na(R) & Rm1 == 1))
+  assign(paste(R_name), R[which(!is.na(R) & Rm1 == 1)])
+  assign(paste(R_name, "ind1", sep = "_"), which(R == 1))
+  assign(paste(R_name, "N1", sep = "_"), sum(R == 1, na.rm = T))
+  assign(paste(R_name, "ind0", sep = "_"), which(R == 0))
+  assign(paste(R_name, "N0", sep = "_"), sum(R == 0, na.rm = T))
+  
+  rm(i, R_name, R, Rm1_name, Rm1)
+  
+}
+
+
+>>>>>>> Stashed changes
 # Create lists ------------------------------------------------------------
 
 {
@@ -315,7 +378,11 @@ R_0_N0 = sum(R_0 == 0, na.rm = T)
       # "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
       # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", #"c_3",
       # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", #"c_4", 
+<<<<<<< Updated upstream
       # "alpha_p", "gamma_p_", #"c_p",
+=======
+      "alpha_p", "gamma_p_", #"c_p",
+>>>>>>> Stashed changes
       "gamma_M_R_0_cat3", "c_M_R_0_cat3"
       # "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
       # "gamma_M_R_1_cat5", "c_M_R_1_cat5",
@@ -341,6 +408,10 @@ R_0_N0 = sum(R_0 == 0, na.rm = T)
     parTrue[[i]] <- get(i)
   }
   
+<<<<<<< Updated upstream
+=======
+  latentTrue <- list(theta_0 = theta_0)
+>>>>>>> Stashed changes
 }
 {
 stan_data <- list()
@@ -366,7 +437,11 @@ for (i in
        # "C_4_num", "I_C_4_num", "I_C_4_ind", "M_C_4",
        # "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
        "R_0_N", "R_0_ind", "R_0", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1",
+<<<<<<< Updated upstream
        # "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
+=======
+       "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
+>>>>>>> Stashed changes
        # "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1",
        # "R_3_N", "R_3_ind", "R_3", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1",
        # "R_4_N", "R_4_ind", "R_4", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1",
@@ -415,5 +490,9 @@ fit_stan = stan(
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
 
+<<<<<<< Updated upstream
 save(list = c("stan_data", "fit_stan", "parNames", "parTrue"), file = "~/bin/R/JMP/work/sim_1")
+=======
+save(list = c("stan_data", "fit_stan", "parNames", "parTrue", "latentTrue"), file = "~/bin/JMP/work/sim")
+>>>>>>> Stashed changes
 
