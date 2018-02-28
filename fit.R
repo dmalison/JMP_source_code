@@ -1,5 +1,3 @@
-# Last modified: 
-
 # Prologue ----------------------------------------------------------------
 
 setwd("~/bin/R/JMP/JMP_source_code")
@@ -340,7 +338,7 @@ M_prior <- function(variable, period, n_cat) {
       # "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
       # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", #"c_3",
       # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", #"c_4", 
-      # "alpha_p", "gamma_p_", #"c_p",
+      "alpha_p", "gamma_p_", #"c_p",
       "gamma_M_R_0_cat3", "c_M_R_0_cat3"
       # "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
       # "gamma_M_R_1_cat5", "c_M_R_1_cat5",
