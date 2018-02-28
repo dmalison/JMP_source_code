@@ -1,7 +1,7 @@
 rm(list = ls())
 library("rstan")
 setwd("~/bin/R/JMP/JMP_source_code")
-load('~/bin/R/JMP/work/fit')
+load('~/bin/R/JMP/work/sim_1')
 
 # library("shinystan")
 # launch_shinystan(fit_stan)
@@ -9,7 +9,9 @@ load('~/bin/R/JMP/work/fit')
 k = 1
 i = parNames[k]
 regex = grep(paste(paste(i,"[[].*[]]", sep = ""),"|","^",i,"$", sep = ""), names(fit_stan), value = T)
-#summary(fit_stan, i)[[1]][,c(1,6,4,8,9,10)]
+
+cbind(as.vector(t(parTrue[[i]])), summary(fit_stan, i)[[1]][,c(1,6,4,8,9,10)])
+(t(parTrue[[i]]) >= summary(fit_stan, i)[[1]][,4])*(t(parTrue[[i]]) <= summary(fit_stan, i)[[1]][,9])
 traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = F)
 k = k + 1
 

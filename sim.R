@@ -407,13 +407,13 @@ fit_stan = stan(
            #           "theta_1", "theta_2", "theta_3", "theta_4"
   ),
   include = T,
-  chains = 1,
-  iter = 10,
-  warmup = 5,
-  refresh = 1,
+  chains = 8,
+  iter = 750,
+  warmup = 500,
+  refresh = 10,
   init_r = .5,
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
 
-save(list = c("stan_data", "fit_stan", "parNames", "parTrue"), file = "~/bin/R/JMP/work/sim")
+save(list = c("stan_data", "fit_stan", "parNames", "parTrue"), file = "~/bin/R/JMP/work/sim_1")
 
