@@ -1,3 +1,6 @@
+# Estimates model parameters using simulated data
+# Parameter values chosen to match posterior means from fit
+
 # Prologue ----------------------------------------------------------------
 
 setwd("~/bin/R/JMP/JMP_source_code")
@@ -92,8 +95,14 @@ colnames(theta_0) <- "R"
 rm(theta_R_0)
 
 R_1 <- 
-  ((X %*% alpha_p[,1] + theta_0[,1] + gamma_p_[1,1] +
-  theta_0[,1]^2 * gamma_p_[2,1] - rnorm(N)) > 0)*R_0
+  (
+    (
+      X %*% alpha_p[,1] + 
+        gamma_p_[1,1] * theta_0[,1] +
+        gamma_p_[2,1] * theta_0[,1]^2 - 
+        rnorm(N)
+    ) > 0
+  )*R_0
 
 # Simulate measurements ---------------------------------------------------
 
