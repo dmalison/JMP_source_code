@@ -1,6 +1,6 @@
 # Prologue ----------------------------------------------------------------
 
-setwd("~/bin/R/JMP/JMP_source_code")
+setwd("~/bin/JMP/JMP_source_code")
 rm(list = ls())
 
 library("rstan")       # used to sample from posterior using MCMC
@@ -334,15 +334,15 @@ M_prior <- function(variable, period, n_cat) {
     c(
       #      "corr_lambda", "c", 
       "alpha_0", "sigma_0", #"c_0",
-      # "alpha_1", "gamma_1", "xi_1", "delta_1", "corr_1", #"c_1",
+      "alpha_1", "gamma_1", "xi_1", "delta_1", "corr_1", #"c_1",
       # "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
       # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", #"c_3",
       # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", #"c_4", 
       "alpha_p", "gamma_p_", #"c_p",
-      "gamma_M_R_0_cat3", "c_M_R_0_cat3"
-      # "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
-      # "gamma_M_R_1_cat5", "c_M_R_1_cat5",
-      # "gamma_M_N_1_cat5", "c_M_N_1_cat5",
+      "gamma_M_R_0_cat3", "c_M_R_0_cat3",
+      "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
+      "gamma_M_R_1_cat5", "c_M_R_1_cat5",
+      "gamma_M_N_1_cat5", "c_M_N_1_cat5"
       # "gamma_M_R_2_cat3", "c_M_R_2_cat3", 
       # "gamma_M_R_2_cat5", "c_M_R_2_cat5",
       # "gamma_M_N_2_cat3", "c_M_N_2_cat3",
@@ -432,8 +432,9 @@ fit_stan = stan(
   data = stan_data,
   pars = c(parNames,
 #           "lambda",
-           "theta_0" 
-#           "theta_1", "theta_2", "theta_3", "theta_4"
+           "theta_0", 
+           "theta_1"
+#"theta_2", "theta_3", "theta_4"
   ),
   include = T,
   chains = 8,
@@ -444,6 +445,6 @@ fit_stan = stan(
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
 
-save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/R/JMP/work/fit")
+save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit")
 
 
