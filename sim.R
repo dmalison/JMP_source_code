@@ -3,9 +3,9 @@
 
 # Prologue ----------------------------------------------------------------
 
-setwd("~/bin/R/JMP/JMP_source_code")
+setwd("~/bin/JMP/JMP_source_code")
 rm(list = ls())
-load("~/bin/R/JMP/work/fit")
+load("~/bin/JMP/work/fit")
 
 library("rstan")       # used to sample from posterior using MCMC
 library("foreign")     # used to import data from Stata
@@ -19,7 +19,7 @@ options(mc.cores = parallel::detectCores())
 
 # Create simulated data frame ---------------------------------------------------------------
 
-N = 5000             # number of observations for simulated data set
+N = 10000             # number of observations for simulated data set
 
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
 
@@ -454,5 +454,5 @@ fit_stan = stan(
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
 
-save(list = c("stan_data", "fit_stan", "parNames", "parTrue", "latentTrue"), file = "~/bin/R/JMP/work/sim")
+save(list = c("stan_data", "fit_stan", "parNames", "parTrue", "latentTrue"), file = "~/bin/JMP/work/sim")
 
