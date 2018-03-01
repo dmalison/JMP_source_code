@@ -314,20 +314,20 @@ M_prior <- function(variable, period, n_cat) {
 R_0_N = sum(!is.na(data_raw$R_0))
 R_0_ind = which(!is.na(data_raw$R_0))
 R_0 = data_raw$R_0
-R_0_ind1 = which(R_0 == 1)
 R_0_N1 = sum(R_0 == 1, na.rm = T)
-R_0_ind0 = which(R_0 == 0)
+R_0_ind1 = which(R_0 == 1)
 R_0_N0 = sum(R_0 == 0, na.rm = T)
+R_0_ind0 = which(R_0 == 0)
 
 for (i in 1:1){
   
   # create local names
   
   R_name = paste("R",i,sep = "_")
-  R = data_raw[[R_name]]
+  R = get(R_name)
   
   Rm1_name = paste("R",i-1,sep = "_")
-  Rm1 = data_raw[[Rm1_name]]
+  Rm1 = get(Rm1_name)
   
   assign(paste(R_name, "ind", sep = "_"), which(!is.na(R) & Rm1 == 1))
   assign(paste(R_name, "N", sep = "_"), sum(!is.na(R) & Rm1 == 1))
@@ -340,7 +340,6 @@ for (i in 1:1){
   rm(i, R_name, R, Rm1_name, Rm1)
   
 }
-
 
 # Create lists ------------------------------------------------------------
 

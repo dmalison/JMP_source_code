@@ -1,7 +1,7 @@
 rm(list = ls())
 library("rstan")
-setwd("~/bin/R/JMP/JMP_source_code")
-load('~/bin/R/JMP/work/sim')
+setwd("~/bin/JMP/JMP_source_code")
+load('~/bin/JMP/work/sim')
 
 # library("shinystan")
 # launch_shinystan(fit_stan)
