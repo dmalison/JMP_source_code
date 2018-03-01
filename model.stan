@@ -1,9 +1,3 @@
-/***
-
-Last modified: 
-
-***/
-
 functions {
   vector standardize(vector X){
     //normalizes vector to have zero mean and unit standard deviation
@@ -164,14 +158,14 @@ data {
     int<lower = 0, upper = N> R_0_ind0[R_0_N0];
     int<lower = 0, upper = N> R_0_N1;
     int<lower = 0, upper = N> R_0_ind1[R_0_N1];
-    // 
-    // int<lower = 0, upper = N> R_1_N;
-    // int<lower = 0, upper = N> R_1_ind[R_1_N];
-    // int<lower = 0, upper = 1> R_1[R_1_N];
-    // int<lower = 0, upper = N> R_1_N0;
-    // int<lower = 0, upper = N> R_1_ind0[R_1_N0];
-    // int<lower = 0, upper = N> R_1_N1;
-    // int<lower = 0, upper = N> R_1_ind1[R_1_N1];
+
+    int<lower = 0, upper = N> R_1_N;
+    int<lower = 0, upper = N> R_1_ind[R_1_N];
+    int<lower = 0, upper = 1> R_1[R_1_N];
+    int<lower = 0, upper = N> R_1_N0;
+    int<lower = 0, upper = N> R_1_ind0[R_1_N0];
+    int<lower = 0, upper = N> R_1_N1;
+    int<lower = 0, upper = N> R_1_ind1[R_1_N1];
     // 
     // int<lower = 0, upper = N> R_2_N;
     // int<lower = 0, upper = N> R_2_ind[R_2_N];
@@ -505,8 +499,8 @@ parameters {
 
 /*** relationship indicators ***/
 
-  // matrix[X_num,5] alpha_p_tilde;
-  // matrix[2,5] gamma_p_;
+  matrix[X_num,1] alpha_p_tilde;
+  matrix[2,1] gamma_p_;
 
 /*** anchors ***/
   
@@ -900,9 +894,9 @@ model {
   
   /*** indicators ***/
 
-  // to_vector(alpha_p_tilde)
-  //   ~ normal(normal_mu_prior, normal_sigma_prior);
-  // to_vector(gamma_p_) ~ normal(normal_mu_prior, normal_sigma_prior);
+  to_vector(alpha_p_tilde)
+    ~ normal(normal_mu_prior, normal_sigma_prior);
+  to_vector(gamma_p_) ~ normal(normal_mu_prior, normal_sigma_prior);
 
   /*** theta_0 ***/
   
@@ -1112,16 +1106,16 @@ model {
 
 /*** relationship indicators ***/
 
-//   R_1 ~ 
-//     bernoulli(
-//       Phi_approx(
-//         X_Q[R_1_ind] * alpha_p_tilde[,1] +
-//         theta_0[R_1_ind,1] * gamma_p_[1,1] +
-//         square(theta_0[R_1_ind,1]) * gamma_p_[2,1] // +
-// //        lambda[R_1_ind,1] * c_p[1] // + 
-// //        lambda[,4] * c[4]
-//         )
-//       );
+  R_1 ~
+    bernoulli(
+      Phi_approx(
+        X_Q[R_1_ind] * alpha_p_tilde[,1] +
+        theta_0[R_1_ind,1] * gamma_p_[1,1] +
+        square(theta_0[R_1_ind,1]) * gamma_p_[2,1] // +
+//        lambda[R_1_ind,1] * c_p[1] // +
+//        lambda[,4] * c[4]
+        )
+      );
 //   
 //   R_2 ~ 
 //     bernoulli(
@@ -1367,7 +1361,7 @@ generated quantities {
   // matrix[X_num,2] beta_3 = X_R\beta_3_tilde;
   // matrix[X_num,2] beta_4 = X_R\beta_4_tilde;
 
-//  matrix[X_num,5] alpha_p = X_R\alpha_p_tilde;
+  matrix[X_num,1] alpha_p = X_R\alpha_p_tilde;
 
 //  matrix[X_num,anchor_num] alpha_anchor = X_R\alpha_anchor_tilde;
 
