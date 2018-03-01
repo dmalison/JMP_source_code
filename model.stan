@@ -271,12 +271,12 @@ transformed data {
   real normal_mu_prior = 0; // prior mean for standardized coefficients 
   real<lower = 0> normal_sigma_prior = 3; // prior variance for standardized coefficients and threshold parameters
   
-  real lkj_sd_prior = .25; // prior standard deviation for correlation parameters
+  real lkj_sd_prior = .5; // prior standard deviation for correlation parameters
   real lkj_eta_prior_2 = .5/square(lkj_sd_prior)*(1 - square(lkj_sd_prior)); // convert sd to eta parameter
   real lkj_eta_prior_3 = .5/square(lkj_sd_prior)*(1 - 2*square(lkj_sd_prior)); 
   real lkj_eta_prior_4 = .5/square(lkj_sd_prior)*(1 - 3*square(lkj_sd_prior));   
   
-  real gamma_sd_prior = .5; // prior standard deviation for factor loading and st dev parameters
+  real gamma_sd_prior = 1; // prior standard deviation for factor loading and st dev parameters
   
   vector<lower = 0>[R_0_cat3_num] gamma_M_R_0_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_0_cat3_mean);
   vector<lower = 0>[R_0_cat3_num] gamma_M_R_0_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_0_cat3_mean;
@@ -527,6 +527,7 @@ transformed parameters {
   matrix[1,2] gamma_1;
   row_vector[1] xi_1;
   matrix[X_num,1] delta_1_tilde;
+  row_vector[2] sigma_1;
 //  vector[2] c_1;
 
   // matrix[X_num,3] alpha_2_tilde;
@@ -654,8 +655,10 @@ transformed parameters {
     gamma_1[1,] = gamma_1_raw ./ theta_1_sd;
     delta_1_tilde = delta_1_raw / theta_1_sd[2];
     xi_1        = xi_1_raw / theta_1_sd[2];
+    sigma_1 = rep_row_vector(1,2) ./ theta_1_sd;
 
  //   c_1 = c[1:2] ./ theta_1_sd';
+    
   } 
 /*** assign theta_2 ***/ 
 {

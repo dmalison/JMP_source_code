@@ -19,7 +19,7 @@ options(mc.cores = parallel::detectCores())
 
 # Create simulated data frame ---------------------------------------------------------------
 
-N = 10000             # number of observations for simulated data set
+N = 5000             # number of observations for simulated data set
 
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
 
@@ -82,16 +82,15 @@ for (i in parNames){
 
 # theta_0
 
-theta_R_0 <- 
-  X %*% alpha_0 + 
+theta_0 <- 
+  (X %*% alpha_0 + 
 #  c_0[1]*lambda[,1] + 
-  rnorm(N, sd = sigma_0)
-
-theta_0 <- cbind(theta_R_0)
+  rnorm(N, sd = sigma_0))*data_raw$R_0
 
 colnames(theta_0) <- "R"
 
-rm(theta_R_0)
+
+# R_1
 
 R_1 <- 
   (
@@ -103,31 +102,75 @@ R_1 <-
     ) > 0
   )*R_0
 
+# theta_1
+
+theta_1 <- 
+  X %*% alpha_1 +
+  (X %*% cbind(0,beta_1))*rep(R_0,2) + (X %*% cbind(0,delta_1))*rep(R_1,2) +
+  rep(theta_0,2) * (rep(gamma_1, each = N) + cbind(0,xi_1*R_1)) + 
+  rmvnorm(N, sigma = diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
+  
+theta_1[,1] <- theta_1[,1]*R_1
+
+colnames(theta_1) <- c("R", "N")
+
 # Simulate measurements ---------------------------------------------------
 
-variable <- "R" # latent variable
-period <- 0 # period
-n_cat <- 3 # number of response categories
-theta <- "theta_0"
-
-name <- paste(paste(variable, period, sep = "_"), "_cat", n_cat, sep = "")
-
-num <- stan_data[[paste(name, "_num", sep = "")]] # how many measurements
-
-gamma_M <- get(paste("gamma_","M_",  name, sep = ""))  # factor loading draws
-c_M <- get(paste("c_","M_",  name, sep = "")) # threshold parameter draws
-
-for (m in 1:num){
+M_sim <- function(variable, period, n_cat){
   
-  U <- get(theta)[,variable] * gamma_M[m]  + rlogis(N)
-  M_name <- paste("M_",name, "_", m, sep = "")
+  variable <- as.character(variable)
   
-  M <- cut(U, c(-Inf, c_M[m,], Inf), labels = F)
-  M[which(is.na(data_raw[[M_name]]))] <- NA
-  data_raw[[M_name]] <- M
+  theta <- paste("theta", period, sep = "_")
   
-  rm(m, U, M)
+  name <- paste(paste(variable, period, sep = "_"), "_cat", n_cat, sep = "")
   
+  num <- stan_data[[paste(name, "_num", sep = "")]] # how many measurements
+  
+  gamma_M <- get(paste("gamma_","M_",  name, sep = ""))  # factor loading draws
+  c_M <- get(paste("c_","M_",  name, sep = "")) # threshold parameter draws
+  
+  for (m in 1:num){
+    
+    U <- get(theta)[,variable] * gamma_M[m]  + rlogis(N)
+    M_name <- paste("M_",name, "_", m, sep = "")
+    
+    M <- cut(U, c(-Inf, c_M[m,], Inf), labels = F)
+    M[which(is.na(data_raw[[M_name]]))] <- NA
+    
+    data_raw[[M_name]] <- M
+    
+    rm(m, U,M)
+    
+  }
+  
+  assign("data_raw", data_raw, envir = globalenv())
+  
+}
+
+M_frame <- 
+  data.frame(
+    variable = 
+      c(
+        "R", 
+        "R","R","N"
+      ),
+    period = 
+      c(
+        0,
+        1,1,1
+      ),
+    n_cat = 
+      c(
+        3,
+        3,5,5
+      )
+  )
+
+for (i in 1:nrow(M_frame)){
+  
+  M_sim(M_frame[i,1], M_frame[i,2], M_frame[i,3])
+  
+  rm(i)
 }
 
 # Turn simulated measurements into concatenated vectors -------------------
@@ -192,22 +235,6 @@ extract <- function(variable, period, n_cat){
   
 }
 
-M_frame <- # contains variable, period, and number of categories for all measurements
-  data.frame(
-    variable = 
-      c(
-        "R" 
-      ),
-    period = 
-      c(
-        0
-      ),
-    n_cat = 
-      c(
-        3
-      )
-  )
-
 # extract measurements
 
 # *_num: Number of measurements
@@ -245,7 +272,6 @@ M_prior <- function(variable, period, n_cat) {
   
   name = paste(variable, period, paste("cat", n_cat, sep = ""), sep = "_")
   M_name = paste("M", name, sep = "_")
-  theta_name = paste("theta", variable, period, sep = "_")
   
   num = # number of measurements
     length(
@@ -260,7 +286,9 @@ M_prior <- function(variable, period, n_cat) {
   
   eq_M = M ~ theta # ordered logit measurement equation
   
-  theta = data_raw[[theta_name]] # use measurement average as a proxy
+  theta = rowMeans(data_raw[,paste(M_name, 1:num, sep = "_")], na.rm = T)
+  
+  theta = (theta - mean(theta, na.rm = T))/sd(theta, na.rm = T)
   
   # run ordered logit for each measurement
   
@@ -280,9 +308,9 @@ M_prior <- function(variable, period, n_cat) {
     gamma_mean[m] = polr_fit$coefficients["theta"]
     c_mean[[m]] = polr_fit$zeta
     
+    assign(paste("gamma_M", name, "mean", sep = "_"), gamma_mean, envir = globalenv())
+    assign(paste("c_M", name, "mean", sep = "_"), c_mean, envir = globalenv())
   }
-  
-  list(name = name, gamma_mean = gamma_mean, c_mean = c_mean)
   
 } 
 
@@ -290,15 +318,10 @@ M_prior <- function(variable, period, n_cat) {
 {
   for (i in (1:nrow(M_frame))){
     
-    prior <- M_prior(M_frame[i,1], M_frame[i,2], M_frame[i,3])
-    
-    assign(paste("gamma_M", prior$name, "mean", sep = "_"), prior$gamma_mean)
-    assign(paste("c_M", prior$name, "mean", sep = "_"), prior$c_mean)
-    
-    rm(i, prior)
+  M_prior(M_frame[i,1], M_frame[i,2], M_frame[i,3])
     
   }
-  rm(M_frame)
+  rm(i, M_frame)
 }
 # Extract indicators ------------------------------------------------------
 
@@ -347,15 +370,15 @@ for (i in 1:1){
     c(
       #      "corr_lambda", "c", 
       "alpha_0", "sigma_0", #"c_0",
-      # "alpha_1", "gamma_1", "xi_1", "delta_1", "corr_1", #"c_1",
+      "alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1", #"c_1",
       # "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
       # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", #"c_3",
       # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", #"c_4", 
       "alpha_p", "gamma_p_", #"c_p",
-      "gamma_M_R_0_cat3", "c_M_R_0_cat3"
-      # "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
-      # "gamma_M_R_1_cat5", "c_M_R_1_cat5",
-      # "gamma_M_N_1_cat5", "c_M_N_1_cat5",
+      "gamma_M_R_0_cat3", "c_M_R_0_cat3",
+      "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
+      "gamma_M_R_1_cat5", "c_M_R_1_cat5",
+      "gamma_M_N_1_cat5", "c_M_N_1_cat5"
       # "gamma_M_R_2_cat3", "c_M_R_2_cat3", 
       # "gamma_M_R_2_cat5", "c_M_R_2_cat5",
       # "gamma_M_N_2_cat3", "c_M_N_2_cat3",
@@ -377,7 +400,13 @@ for (i in 1:1){
     parTrue[[i]] <- get(i)
   }
   
-  latentTrue <- list(theta_0 = theta_0)
+  latentTrue <- list()
+  
+  for (i in c("theta_0", "theta_1")) {
+    latentTrue[[i]] <- get(i)
+    rm(i)
+  }
+  
 }
 {
 stan_data <- list()
@@ -386,9 +415,9 @@ for (i in
      c("N",
        "X_num", "X",
        "R_0_cat3_num", "I_R_0_cat3_num", "I_R_0_cat3_ind", "M_R_0_cat3",
-       # "R_1_cat3_num", "I_R_1_cat3_num", "I_R_1_cat3_ind", "M_R_1_cat3",
-       # "R_1_cat5_num", "I_R_1_cat5_num", "I_R_1_cat5_ind", "M_R_1_cat5",
-       # "N_1_cat5_num", "I_N_1_cat5_num", "I_N_1_cat5_ind", "M_N_1_cat5",
+       "R_1_cat3_num", "I_R_1_cat3_num", "I_R_1_cat3_ind", "M_R_1_cat3",
+       "R_1_cat5_num", "I_R_1_cat5_num", "I_R_1_cat5_ind", "M_R_1_cat5",
+       "N_1_cat5_num", "I_N_1_cat5_num", "I_N_1_cat5_ind", "M_N_1_cat5",
        # "R_2_cat3_num", "I_R_2_cat3_num", "I_R_2_cat3_ind", "M_R_2_cat3",
        # "R_2_cat5_num", "I_R_2_cat5_num", "I_R_2_cat5_ind", "M_R_2_cat5",
        # "N_2_cat3_num", "I_N_2_cat3_num", "I_N_2_cat3_ind", "M_N_2_cat3",
@@ -407,10 +436,10 @@ for (i in
        # "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1",
        # "R_3_N", "R_3_ind", "R_3", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1",
        # "R_4_N", "R_4_ind", "R_4", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1",
-       "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean"
-       # "gamma_M_R_1_cat3_mean", "c_M_R_1_cat3_mean", 
-       # "gamma_M_R_1_cat5_mean", "c_M_R_1_cat5_mean",
-       # "gamma_M_N_1_cat5_mean", "c_M_N_1_cat5_mean",
+       "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean",
+       "gamma_M_R_1_cat3_mean", "c_M_R_1_cat3_mean",
+       "gamma_M_R_1_cat5_mean", "c_M_R_1_cat5_mean",
+       "gamma_M_N_1_cat5_mean", "c_M_N_1_cat5_mean"
        # "gamma_M_R_2_cat3_mean", "c_M_R_2_cat3_mean", 
        # "gamma_M_R_2_cat5_mean", "c_M_R_2_cat5_mean",
        # "gamma_M_N_2_cat3_mean", "c_M_N_2_cat3_mean",
@@ -431,7 +460,7 @@ for (i in
 }
 }
 
-rm(list = c(names(stan_data), names(parTrue)))
+rm(list = c(names(stan_data), names(parTrue), names(latentTrue)))
 
 # Fit model with stan -----------------------------------------------------
 
@@ -440,8 +469,8 @@ fit_stan = stan(
   data = stan_data,
   pars = c(parNames,
            #           "lambda",
-           "theta_0" 
-           #           "theta_1", "theta_2", "theta_3", "theta_4"
+           "theta_0", 
+           "theta_1" # "theta_2", "theta_3", "theta_4"
   ),
   include = T,
   chains = 8,
