@@ -1,13 +1,12 @@
+# Makes ICC plots
+
 # Prologue ----------------------------------------------------------------
 
-setwd("~/bin/R/FragileFamilies/CurrentVersion")
+setwd("~/bin/JMP/JMP_source_code")
 rm(list = ls())
-load("ME_RE_fit_v4_1")
+load('~/bin/JMP/work/fit')
 
 library("rstan")       # used to sample from posterior using MCMC
-library("foreign")     # used to import data from Stata
-library("mvtnorm")     # used to draw from multivariate normal
-library("MASS")        # used to estimate ordered logits for prior parameters
 
 # RStan recommends calling the following lines before use
 
@@ -16,7 +15,7 @@ options(mc.cores = parallel::detectCores())
 
 # Extract objects from stan_fit  ---------------------------------------
 
-for (i in "theta_0"){
+for (i in c("theta_0", "theta_1")){
   assign(i,extract(fit_stan, pars = i)[[1]])
   rm(i)
 }
@@ -24,6 +23,7 @@ for (i in "theta_0"){
 n_draws <- nrow(extract(fit_stan, pars = "lp__")[[1]])
 
 dimnames(theta_0)[[3]] <- "R"
+dimnames(theta_1)[[3]] <- c("R","N")
 
 N <- stan_data$N
 
@@ -49,126 +49,6 @@ gamma_M <- extract(fit_stan, pars = paste("gamma_","M_",  name, sep = ""))[[1]] 
 c_M <- extract(fit_stan, pars = paste("c_","M_",  name, sep = ""))[[1]] # threshold parameter draws
 
 pos <- 1 # keeps track of position in concatenated vectors
-
-# Simulate measurements ---------------------------------------------------------
-
-M_sim <- list() 
-M_true <- matrix(nrow = N, ncol = num)
-
-pos = 1
-
-for (m in 1:num){
-  
-  index = get(theta)[,,variable] * gamma_M[,m] 
-  # latent index for measurement M 
-  # each column contains posterior draws for one observation
-  
-  index_out <- # indicies of x-axis in plots (captures 99% of draws, range rounded to integers)
-    seq(
-      from = floor(quantile(index, probs = .005)), 
-      to = ceiling(quantile(index, probs = .995)),
-      length.out = n_out
-    )
-  
-  M_ind <- I_ind[pos:(pos + I_num[m]-1)] # indices of non-missing measurements
-  
-  M_true[M_ind,m] <- M[pos:(pos + I_num[m]-1)] # collect measurements of non-missing observations
-  
-  x <- index[,M_ind] # pick columns whose observations are non-missing
-
-  pos = pos + I_num[m] # update position in concatented vectors
-  
-  U <- x + rlogis(I_num[m]*n_draws)
-  
-  M_sim[[m]] <- matrix(nrow = n_draws, ncol = N)
-  
-  for (i in 1:n_draws){
-    M_sim[[m]][i,M_ind] <- cut(U[i,], c(-Inf, c_M[i,m,], Inf), labels = F)
-  }
-  print(m)
-}
-
-
-M_avg_sim = matrix(0, nrow = n_draws, ncol = N)
-M_nomiss = matrix(0, nrow = n_draws, ncol = N)
-
-for (m in 1:num){
-  
-  M_temp <- M_sim[[m]]
-  
-  M_nomiss <- M_nomiss + !is.na(M_temp)
-  
-  M_temp[is.na(M_temp)] <- 0
-  
-  M_avg_sim <- M_avg_sim + M_temp
-  
-  rm(M_temp)
-}
-
-M_avg_sim <- M_avg_sim/M_nomiss
-
-plot(
-  rowMeans(M_true, na.rm = T),
-  apply(M_avg_sim, 2, median),
-  cex = .25
-)
-
-
-
-abline(a = 0, b = 1)
-
-dim(M_avg_sim)
-
-M_sim[[1]] + M_sim[[2]]
-
-M_sum
-
-Reduce(function(x,y) !is.na(x) + !is.na(y), M_sim)
-
-# Construct chisq table ---------------------------------------------------
-
-freq_sim  <- matrix(nrow =  n_cat*num, ncol = n_cat*num)
-freq_true <- matrix(nrow =  n_cat*num, ncol = n_cat*num)
-
-chisq_table <- matrix(nrow = num, ncol = num)
-
-for (m1 in 1:num){
-  for (m2 in m1:num){
-    
-    ind1 <- (n_cat*(m1 - 1) + 1):(n_cat*m1)
-    ind2 <- (n_cat*(m2 - 1) + 1):(n_cat*m2)
-    
-    M_table <- 
-      vapply(
-        1:n_draws, 
-        function(i) prop.table(table(M_sim[[m1]][i,],M_sim[[m2]][i,])),
-        rep(0,n_cat^2)
-      )
-    
-    freq_sim[ind1, ind2] <- rowMeans(M_table)
-    
-    freq_true[ind1, ind2] <- prop.table(table(M_true[,m1], M_true[,m2]))
-    
-    N_m1m2 <- sum(table(M_true[,m1], M_true[,m2]))
-    
-    chisq_table[m1, m2] <- 
-      chisq.test(as.vector(freq_true[ind1, ind2]*N_m1m2), p = as.vector(freq_sim[ind1, ind2]))
-        
-        ( - )^2/*N_m1m2
-      )
-    
-    print(c(m1, m2))
-    
-  }
-}
-
-(freq_true - freq_sim)^2/freq_sim
-
-round(rbind(freq_sim, freq_true)[order(sequence(c(nrow(freq_sim), nrow(freq_true)))),],3)
-
-round(freq_sim, 3)
-
-
 
 # Construct plots ---------------------------------------------------------
 
@@ -235,11 +115,11 @@ for (m in 1:num){
   
   plot_colors <- rainbow(n_cat, v = .75) 
   
-  png(
-    paste("~/out/Plots/",paste(name, m, sep = "_"),".png", sep = ""),
-    width = 300, 
-    height = 240
-    )
+  # png(
+  #   paste("~/out/Plots/",paste(name, m, sep = "_"),".png", sep = ""),
+  #   width = 300, 
+  #   height = 240
+  #   )
   
   plot(NA,
        xlim = range(index_out),
@@ -284,7 +164,7 @@ for (m in 1:num){
     lty = 1
   )
   
-  dev.off()
+  # dev.off()
   
   print(m)
   
