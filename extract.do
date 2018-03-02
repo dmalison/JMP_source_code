@@ -380,6 +380,17 @@ foreach var of local vars {
 
 }
 
+foreach var of local vars {
+
+	gen M_N_1_cat5_`i_cat5' = .
+
+	replace M_N_1_cat5_`i_cat5' = 6 - f2b16`var'  if f2b16`var' > 0 & f2b16`var' < . // Mothers who live with their children
+	replace M_N_1_cat5_`i_cat5' = 6 - f2b37`var'  if f2b37`var' > 0 & f2b37`var' < . // Mothers who do not live with their children
+
+	local i_cat5 = `i_cat5' + 1
+
+}
+
 * Average non-missing measurements
 
 egen theta_N_1 = rowmean(M_N_1_cat5*)
