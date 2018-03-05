@@ -108,7 +108,7 @@ theta_1 <-
   rep(c(0, beta_1), each = N)*rep(R_0*(1-R_1),2) +
   rep(c(0, delta_1), each = N)*rep(R_1,2) + 
   rep(theta_0, 2) * (cbind(gamma_1[1], xi_1*R_1 + gamma_1[2]*(1-R_1))) + 
-  rmvnorm(N, sigma = corr_1) #diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
+  rmvnorm(N, sigma = diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
   
 theta_1[,1] <- theta_1[,1]*R_1
 
