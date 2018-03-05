@@ -19,7 +19,7 @@ options(mc.cores = parallel::detectCores())
 
 # Create simulated data frame ---------------------------------------------------------------
 
-N = 10000             # number of observations for simulated data set
+N = 5000             # number of observations for simulated data set
 
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
 
@@ -107,8 +107,8 @@ theta_1 <-
   X %*% alpha_1 +
   rep(c(0, beta_1), each = N)*rep(R_0*(1-R_1),2) +
   rep(c(0, delta_1), each = N)*rep(R_1,2) + 
-  rep(theta_0, 2) * (cbind(gamma_1[1], xi_1*R_1 + gamma_1[2]*(1-R_1))) + 
-  rmvnorm(N, sigma = corr_1) #diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
+  rep(theta_0, 2) * cbind(gamma_1[1], xi_1*R_1 + gamma_1[2]*(1-R_1)) + 
+  rmvnorm(N, sigma = diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
   
 theta_1[,1] <- theta_1[,1]*R_1
 
