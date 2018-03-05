@@ -19,7 +19,7 @@ options(mc.cores = parallel::detectCores())
 
 # Create simulated data frame ---------------------------------------------------------------
 
-N = 5000             # number of observations for simulated data set
+N = 10000             # number of observations for simulated data set
 
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
 
@@ -82,34 +82,35 @@ for (i in parNames){
 
 # theta_0
 
-# theta_0 <- 
-#   (X %*% alpha_0 + 
-# #  c_0[1]*lambda[,1] + 
-#   rnorm(N, sd = sigma_0))*data_raw$R_0
-# 
-# colnames(theta_0) <- "R"
+theta_0 <-
+  (X %*% alpha_0 +
+#  c_0[1]*lambda[,1] +
+  rnorm(N, sd = sigma_0))*R_0
+
+colnames(theta_0) <- "R"
 
 # R_1
 
-# R_1 <- 
-#   (
-#     (
-#       X %*% alpha_p[,1] + 
-#         gamma_p_[1,1] * theta_0[,1] +
-#         gamma_p_[2,1] * theta_0[,1]^2 - 
-#         rnorm(N)
-#     ) > 0
-#   )*R_0
+R_1 <-
+  (
+    (
+      X %*% alpha_p[,1] +
+        gamma_p_[1,1] * theta_0[,1] +
+        gamma_p_[2,1] * theta_0[,1]^2 -
+        rnorm(N)
+    ) > 0
+  )*R_0
 
 # theta_1
 
 theta_1 <- 
   X %*% alpha_1 +
-#  (X %*% cbind(0,beta_1))*rep(R_0,2) + (X %*% cbind(0,delta_1))*rep(R_1,2) +
-#  rep(theta_0,2) * (rep(gamma_1, each = N) + cbind(0,xi_1*R_1)) + 
+  rep(c(0, beta_1), each = N)*rep(R_0*(1-R_1),2) +
+  rep(c(0, delta_1), each = N)*rep(R_1,2) + 
+  rep(theta_0, 2) * (cbind(gamma_1[1], xi_1*R_1 + gamma_1[2]*(1-R_1))) + 
   rmvnorm(N, sigma = corr_1) #diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
   
-#theta_1[,1] <- theta_1[,1]*R_1
+theta_1[,1] <- theta_1[,1]*R_1
 
 colnames(theta_1) <- c("R", "N")
 
@@ -134,7 +135,7 @@ M_sim <- function(variable, period, n_cat){
     M_name <- paste("M_",name, "_", m, sep = "")
     
     M <- cut(U, c(-Inf, c_M[m,], Inf), labels = F)
-#    M[which(is.na(data_raw[[M_name]]))] <- NA
+    M[which(is.na(data_raw[[M_name]]))] <- NA
     
     data_raw[[M_name]] <- M
     
@@ -150,17 +151,17 @@ M_frame <-
   data.frame(
     variable = 
       c(
-#        "R", 
+        "R", 
         "R","R","N"
       ),
     period = 
       c(
-#        0,
+        0,
         1,1,1
       ),
     n_cat = 
       c(
-#        3,
+        3,
         3,5,5
       )
   )
@@ -332,35 +333,35 @@ M_prior <- function(variable, period, n_cat) {
 # *_N1: Number of observations in a relationship this period
 # *_ind1: Indicies of observations in a relationship this period
 
-# R_0_N = sum(!is.na(data_raw$R_0))
-# R_0_ind = which(!is.na(data_raw$R_0))
-# R_0 = data_raw$R_0
-# R_0_N1 = sum(R_0 == 1, na.rm = T)
-# R_0_ind1 = which(R_0 == 1)
-# R_0_N0 = sum(R_0 == 0, na.rm = T)
-# R_0_ind0 = which(R_0 == 0)
+R_0_N = sum(!is.na(data_raw$R_0))
+R_0_ind = which(!is.na(data_raw$R_0))
+R_0 = data_raw$R_0
+R_0_N1 = sum(R_0 == 1, na.rm = T)
+R_0_ind1 = which(R_0 == 1)
+R_0_N0 = sum(R_0 == 0, na.rm = T)
+R_0_ind0 = which(R_0 == 0)
 
-# for (i in 1:1){
-#   
-#   # create local names
-#   
-#   R_name = paste("R",i,sep = "_")
-#   R = get(R_name)
-#   
-#   Rm1_name = paste("R",i-1,sep = "_")
-#   Rm1 = get(Rm1_name)
-#   
-#   assign(paste(R_name, "ind", sep = "_"), which(!is.na(R) & Rm1 == 1))
-#   assign(paste(R_name, "N", sep = "_"), sum(!is.na(R) & Rm1 == 1))
-#   assign(paste(R_name), R[which(!is.na(R) & Rm1 == 1)])
-#   assign(paste(R_name, "ind1", sep = "_"), which(R == 1))
-#   assign(paste(R_name, "N1", sep = "_"), sum(R == 1, na.rm = T))
-#   assign(paste(R_name, "ind0", sep = "_"), which(R == 0))
-#   assign(paste(R_name, "N0", sep = "_"), sum(R == 0, na.rm = T))
-#   
-#   rm(i, R_name, R, Rm1_name, Rm1)
-#   
-# }
+for (i in 1:1){
+
+  # create local names
+
+  R_name = paste("R",i,sep = "_")
+  R = get(R_name)
+
+  Rm1_name = paste("R",i-1,sep = "_")
+  Rm1 = get(Rm1_name)
+
+  assign(paste(R_name, "ind", sep = "_"), which(!is.na(R) & Rm1 == 1))
+  assign(paste(R_name, "N", sep = "_"), sum(!is.na(R) & Rm1 == 1))
+  assign(paste(R_name), R[which(!is.na(R) & Rm1 == 1)])
+  assign(paste(R_name, "ind1", sep = "_"), which(R == 1))
+  assign(paste(R_name, "N1", sep = "_"), sum(R == 1, na.rm = T))
+  assign(paste(R_name, "ind0", sep = "_"), which(R == 0))
+  assign(paste(R_name, "N0", sep = "_"), sum(R == 0, na.rm = T))
+
+  rm(i, R_name, R, Rm1_name, Rm1)
+
+}
 
 # Create lists ------------------------------------------------------------
 
@@ -368,14 +369,13 @@ M_prior <- function(variable, period, n_cat) {
   parNames =
     c(
       #      "corr_lambda", "c", 
-      #"alpha_0", "sigma_0", #"c_0",
-      #"alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1", #"c_1",
-      "alpha_1", "corr_1", 
+      "alpha_0", "sigma_0", #"c_0",
+      "alpha_1", "beta_1", "gamma_1", "delta_1", "xi_1", "corr_1", "sigma_1", #"c_1",
       # "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
       # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", #"c_3",
       # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", #"c_4", 
-      #"alpha_p", "gamma_p_", #"c_p",
-#      "gamma_M_R_0_cat3", "c_M_R_0_cat3",
+      "alpha_p", "gamma_p_", #"c_p",
+      "gamma_M_R_0_cat3", "c_M_R_0_cat3",
       "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
       "gamma_M_R_1_cat5", "c_M_R_1_cat5",
       "gamma_M_N_1_cat5", "c_M_N_1_cat5"
@@ -403,7 +403,7 @@ M_prior <- function(variable, period, n_cat) {
   latentTrue <- list()
   
   for (i in 
-       c(#"theta_0", 
+       c("theta_0", 
          "theta_1")) {
     latentTrue[[i]] <- get(i)
     rm(i)
@@ -416,7 +416,7 @@ stan_data <- list()
 for (i in 
      c("N",
        "X_num", "X",
-       # "R_0_cat3_num", "I_R_0_cat3_num", "I_R_0_cat3_ind", "M_R_0_cat3",
+        "R_0_cat3_num", "I_R_0_cat3_num", "I_R_0_cat3_ind", "M_R_0_cat3",
        "R_1_cat3_num", "I_R_1_cat3_num", "I_R_1_cat3_ind", "M_R_1_cat3",
        "R_1_cat5_num", "I_R_1_cat5_num", "I_R_1_cat5_ind", "M_R_1_cat5",
        "N_1_cat5_num", "I_N_1_cat5_num", "I_N_1_cat5_ind", "M_N_1_cat5",
@@ -433,12 +433,12 @@ for (i in
        # "N_4_cat3_num", "I_N_4_cat3_num", "I_N_4_cat3_ind", "M_N_4_cat3",
        # "C_4_num", "I_C_4_num", "I_C_4_ind", "M_C_4",
        # "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
-       # "R_0_N", "R_0_ind", "R_0", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1",
-       # "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
+       "R_0_N", "R_0_ind", "R_0", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1",
+       "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
        # "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1",
        # "R_3_N", "R_3_ind", "R_3", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1",
        # "R_4_N", "R_4_ind", "R_4", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1",
-       # "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean",
+       "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean",
        "gamma_M_R_1_cat3_mean", "c_M_R_1_cat3_mean",
        "gamma_M_R_1_cat5_mean", "c_M_R_1_cat5_mean",
        "gamma_M_N_1_cat5_mean", "c_M_N_1_cat5_mean"
@@ -471,7 +471,7 @@ fit_stan = stan(
   data = stan_data,
    pars = c(parNames,
   #          #           "lambda",
-  #          #"theta_0", 
+            "theta_0", 
             "theta_1" # "theta_2", "theta_3", "theta_4",
   #          "L_corr_1"
    ),
