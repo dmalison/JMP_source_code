@@ -19,7 +19,7 @@ options(mc.cores = parallel::detectCores())
 
 # Create simulated data frame ---------------------------------------------------------------
 
-N = 5000             # number of observations for simulated data set
+N = 10000             # number of observations for simulated data set
 
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
 
