@@ -101,6 +101,8 @@ R_1 <-
     ) > 0
   )*R_0
 
+data_raw$R_1 <- R_1
+
 # theta_1
 
 theta_1 <- 
@@ -113,6 +115,22 @@ theta_1 <-
 theta_1[,1] <- theta_1[,1]*R_1
 
 colnames(theta_1) <- c("R", "N")
+
+# R_2
+
+R_2 <-
+  (
+    (
+      X %*% alpha_p[,2] +
+        gamma_p_[1,2] * theta_1[,1] +
+        gamma_p_[2,2] * theta_1[,1]^2 -
+        rnorm(N)
+    ) > 0
+  )*R_1
+
+R_2[which(is.na(data_raw$R_2))] <- NA
+
+data_raw$R_2 <- R_2
 
 # Simulate measurements ---------------------------------------------------
 
@@ -341,15 +359,15 @@ R_0_ind1 = which(R_0 == 1)
 R_0_N0 = sum(R_0 == 0, na.rm = T)
 R_0_ind0 = which(R_0 == 0)
 
-for (i in 1:1){
+for (i in 1:2){
 
   # create local names
 
   R_name = paste("R",i,sep = "_")
-  R = get(R_name)
+  R = data_raw[[R_name]]
 
   Rm1_name = paste("R",i-1,sep = "_")
-  Rm1 = get(Rm1_name)
+  Rm1 = data_raw[[Rm1_name]]
 
   assign(paste(R_name, "ind", sep = "_"), which(!is.na(R) & Rm1 == 1))
   assign(paste(R_name, "N", sep = "_"), sum(!is.na(R) & Rm1 == 1))
@@ -416,7 +434,7 @@ stan_data <- list()
 for (i in 
      c("N",
        "X_num", "X",
-        "R_0_cat3_num", "I_R_0_cat3_num", "I_R_0_cat3_ind", "M_R_0_cat3",
+       "R_0_cat3_num", "I_R_0_cat3_num", "I_R_0_cat3_ind", "M_R_0_cat3",
        "R_1_cat3_num", "I_R_1_cat3_num", "I_R_1_cat3_ind", "M_R_1_cat3",
        "R_1_cat5_num", "I_R_1_cat5_num", "I_R_1_cat5_ind", "M_R_1_cat5",
        "N_1_cat5_num", "I_N_1_cat5_num", "I_N_1_cat5_ind", "M_N_1_cat5",
@@ -473,7 +491,6 @@ fit_stan = stan(
   #          #           "lambda",
             "theta_0", 
             "theta_1" # "theta_2", "theta_3", "theta_4",
-  #          "L_corr_1"
    ),
   include = T,
   # chains = 1,

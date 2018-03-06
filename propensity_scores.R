@@ -5,8 +5,8 @@
 rm(list = ls())
 library("rstan")
 
-setwd("~/bin/R/JMP/JMP_source_code")
-load("~/bin/R/JMP/work/fit")
+setwd("~/bin/JMP/JMP_source_code")
+load("~/bin/JMP/work/fit")
 
 # Extract data from stan_data -------------------------------------
 
@@ -29,7 +29,7 @@ for (i in 0:4){
 
 # Extract parameters from fit_stan ------------------------------------------------------
 
-for (i in c(parNames, "theta_0")){
+for (i in c(parNames, "theta_0", "theta_1")){
   x <- extract(fit_stan, pars = i)[[1]]
   assign(i,x)
   rm(i,x)
@@ -37,11 +37,21 @@ for (i in c(parNames, "theta_0")){
 
 # Construct propensity scores ----------------------------------------------
 
-p_0 <- 
-  pnorm(
-    tcrossprod(alpha_p[,,1],X) + 
-      gamma_p_[,1,1] * theta_0[,,1] + gamma_p_[,2,1] * theta_0[,,1]^2
-  )
+for (i in 1:2){
+  
+  theta_R = get(paste("theta", i-1, sep = "_"))[,,1]
+  
+  p <- 
+    pnorm(
+      tcrossprod(alpha_p[,,i],X) + 
+        gamma_p_[,1,i] * theta_R + gamma_p_[,2,i] * theta_R^2
+    )
+  
+  assign(paste("p", i, sep = "_"), p)
+  
+  rm(theta_R, p)
+  
+}
 
 # Construct propensity score histograms ----------------------------------------
 
@@ -49,41 +59,48 @@ x_out <- seq(0,1, length.out = 21)
 sep_col <- rgb(1,0,0,.5)
 tog_col <- rgb(0,0,1,.5)
 
-separated <- 
-  hist(p_0[,intersect(stan_data$R_0_ind1, stan_data$R_1_ind0)], breaks = x_out, plot = F)
-together  <- 
-  hist(p_0[,intersect(stan_data$R_0_ind1, stan_data$R_1_ind1)], breaks = x_out, plot = F)
-
-plot(
-  NA,
-  xlim = c(0,1),
-  ylim = c(0,ceiling(max(separated$density,together$density)*2)/2),
-  xlab = "Propensity Score",
-  ylab = "Density",
-  bty = "n",
-  main = "Year 1"
-)
-
-plot(
-  separated, 
-  freq = F,
-  add = T,
-  col = sep_col
+for (i in 1:2){
+  
+  p <- get(paste("p", i, sep = "_"))
+  
+  separated <- 
+    hist(p[,intersect(stan_data$R_0_ind1, stan_data$R_1_ind0)], breaks = x_out, plot = F)
+  together  <- 
+    hist(p[,intersect(stan_data$R_0_ind1, stan_data$R_1_ind1)], breaks = x_out, plot = F)
+  
+  plot(
+    NA,
+    xlim = c(0,1),
+    ylim = c(0,ceiling(max(separated$density,together$density)*2)/2),
+    xlab = "Propensity Score",
+    ylab = "Density",
+    bty = "n",
+    main = paste("Survey wave", i)
   )
-
-plot(
-  together, 
-  freq = F,
-  add = T,
-  col = tog_col
-)
-
-legend(
-  x = "top",
-  legend = c(expression(paste(R[1] == 0, "  ")), expression(R[1] == 1)),
-  bty = "n",
-  fill = c(sep_col, tog_col),
-  horiz = T,
-  x.intersp = .5
+  
+  plot(
+    separated, 
+    freq = F,
+    add = T,
+    col = sep_col
   )
+  
+  plot(
+    together, 
+    freq = F,
+    add = T,
+    col = tog_col
+  )
+  
+  legend(
+    x = "top",
+    legend = parse(text = paste("R[", i, "] == ", 0:1, sep="")),
+    bty = "n",
+    fill = c(sep_col, tog_col),
+    horiz = T,
+    x.intersp = .5
+  )
+  
+}
+
 

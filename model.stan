@@ -167,14 +167,14 @@ data {
     int<lower = 0, upper = N> R_1_N1;
     int<lower = 0, upper = N> R_1_ind1[R_1_N1];
 
-    // int<lower = 0, upper = N> R_2_N;
-    // int<lower = 0, upper = N> R_2_ind[R_2_N];
-    // int<lower = 0, upper = 1> R_2[R_2_N];
-    // int<lower = 0, upper = N> R_2_N0;
-    // int<lower = 0, upper = N> R_2_ind0[R_2_N0];
-    // int<lower = 0, upper = N> R_2_N1;
-    // int<lower = 0, upper = N> R_2_ind1[R_2_N1];
-    // 
+    int<lower = 0, upper = N> R_2_N;
+    int<lower = 0, upper = N> R_2_ind[R_2_N];
+    int<lower = 0, upper = 1> R_2[R_2_N];
+    int<lower = 0, upper = N> R_2_N0;
+    int<lower = 0, upper = N> R_2_ind0[R_2_N0];
+    int<lower = 0, upper = N> R_2_N1;
+    int<lower = 0, upper = N> R_2_ind1[R_2_N1];
+
     // int<lower = 0, upper = N> R_3_N;
     // int<lower = 0, upper = N> R_3_ind[R_3_N];
     // int<lower = 0, upper = 1> R_3[R_3_N];
@@ -262,7 +262,7 @@ transformed data {
 
   vector[N] R_0_full;
   vector[N] R_1_full; 
-  // vector[N] R_2_full;
+  vector[N] R_2_full;
   // vector[N] R_3_full;
   // vector[N] R_4_full;
 
@@ -349,11 +349,11 @@ transformed data {
 
   /*** assign relationship indicators ***/
 
-     R_0_full           = to_vector(R_0);
-     R_1_full[R_0_ind0] = rep_vector(0, R_0_N0);
-     R_1_full[R_1_ind]  = to_vector(R_1);
-    // R_2_full[R_1_ind0] = rep_vector(0, R_1_N0);
-    // R_2_full[R_2_ind]  = to_vector(R_2);
+    R_0_full           = to_vector(R_0);
+    R_1_full[R_0_ind0] = rep_vector(0, R_0_N0);
+    R_1_full[R_1_ind]  = to_vector(R_1);
+    R_2_full[R_1_ind0] = rep_vector(0, R_1_N0);
+    R_2_full[R_2_ind]  = to_vector(R_2);
     // R_3_full[R_2_ind0] = rep_vector(0, R_2_N0);
     // R_3_full[R_3_ind]  = to_vector(R_3);
     // R_4_full[R_3_ind0] = rep_vector(0, R_3_N0);
@@ -499,8 +499,8 @@ parameters {
 
 /*** relationship indicators ***/
 
-  matrix[X_num,1] alpha_p_tilde;
-  matrix[2,1] gamma_p_;
+  matrix[X_num,2] alpha_p_tilde;
+  matrix[2,2] gamma_p_;
 
 /*** anchors ***/
   
@@ -1114,15 +1114,15 @@ model {
        )
      );
    
-//   R_2 ~ 
-//     bernoulli(
-//       Phi_approx(
-//         X_Q[R_2_ind,] * alpha_p_tilde[,2] +
-//         theta_1[R_2_ind,1] * gamma_p_[1,2] + 
-//         square(theta_1[R_2_ind,1]) * gamma_p_[2,2] // + 
-// //        lambda[R_2_ind,1] * c_p[2] // +
-// //        lambda[R_2_ind,4] * c[4]
-//       ));
+    R_2 ~
+      bernoulli(
+        Phi_approx(
+          X_Q[R_2_ind,] * alpha_p_tilde[,2] +
+          theta_1[R_2_ind,1] * gamma_p_[1,2] +
+          square(theta_1[R_2_ind,1]) * gamma_p_[2,2] // +
+//        lambda[R_2_ind,1] * c_p[2] // +
+//        lambda[R_2_ind,4] * c[4]
+      ));
 // 
 //   R_3 ~ 
 //     bernoulli(
@@ -1356,7 +1356,7 @@ generated quantities {
   // matrix[X_num,2] delta_4 = X_R\delta_4_tilde;
   // 
 
-  matrix[X_num,1] alpha_p = X_R\alpha_p_tilde;
+  matrix[X_num,2] alpha_p = X_R\alpha_p_tilde;
 
 //  matrix[X_num,anchor_num] alpha_anchor = X_R\alpha_anchor_tilde;
 
