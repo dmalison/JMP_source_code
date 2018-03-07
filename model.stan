@@ -413,10 +413,10 @@ parameters {
 /*** theta_1 ***/
 
   matrix[X_num-1,2] alpha_1_tilde_raw;
-  row_vector[1] beta_1_raw;
+  real beta_1_raw;
   row_vector[2] gamma_1_raw;
-  row_vector[1] xi_1_raw;
-  row_vector[1] delta_1_raw;
+  real xi_1_raw;
+  real delta_1_raw;
   cholesky_factor_corr[2] L_corr_1;
 
   matrix[R_1_N1, 2] epsilon_1;
@@ -562,9 +562,9 @@ transformed parameters {
   /*** theta_1 ***/
   
   matrix[X_num,2] alpha_1_tilde;
-  row_vector[1] beta_1;
+  row_vector[2] beta_1;
   matrix[1,2] gamma_1;
-  row_vector[1] delta_1;
+  row_vector[2] delta_1;
   matrix[1,2] xi_1;
   row_vector[2] sigma_1;
   //  vector[2] c_1;
@@ -572,9 +572,9 @@ transformed parameters {
   /*** theta_2 ***/
 
   matrix[X_num,3] alpha_2_tilde;
-  row_vector[2] beta_2;
+  row_vector[3] beta_2;
   matrix[2,3] gamma_2;
-  row_vector[2] delta_2;
+  row_vector[3] delta_2;
   matrix[2,3] xi_2;
   row_vector[3] sigma_2;
   // vector[3] c_2;
@@ -670,14 +670,14 @@ transformed parameters {
       
     theta_N_1[R_1_ind1]  = // theta_N_1 if R_1 = 1
       X_Q_nocons[R_1_ind1,] * alpha_1_tilde_raw[,2] +
-      delta_1_raw[1] +
-      theta_0[R_1_ind1,1] * xi_1_raw[1] +
+      delta_1_raw +
+      theta_0[R_1_ind1,1] * xi_1_raw +
 //      lambda[R_1_ind1,2] * c[2] +
       epsilon_1 * L_corr_1[2,]';
 
     theta_N_1[R_1_ind0] = // theta_N_1 if R_1 = 0
       X_Q_nocons[R_1_ind0,] * alpha_1_tilde_raw[,2] +
-      R_0_full[R_1_ind0] * beta_1_raw[1] +
+      R_0_full[R_1_ind0] * beta_1_raw +
       theta_0[R_1_ind0,1] * gamma_1_raw[2] +
 //      lambda[R_1_ind0,2] * c[2] +
       epsilon_N_1_R1eq0;
@@ -697,11 +697,13 @@ transformed parameters {
 
     alpha_1_tilde[1,]        = -theta_1_mean ./ theta_1_sd;
     alpha_1_tilde[2:X_num,]  = alpha_1_tilde_raw ./ (rep_vector(1, X_num - 1) * theta_1_sd);
-    beta_1 = beta_1_raw / theta_1_sd[2];
+    beta_1[1] = 0;
+    beta_1[2] = beta_1_raw / theta_1_sd[2];
     gamma_1[1,] = gamma_1_raw ./ theta_1_sd;
-    delta_1 = delta_1_raw / theta_1_sd[2];
-    xi_1[1,1] = 0.;
-    xi_1[1,2] = xi_1_raw[1] / theta_1_sd[2];
+    delta_1[1] = 0;
+    delta_1[2] = delta_1_raw / theta_1_sd[2];
+    xi_1[1,1] = gamma_1[1,1];
+    xi_1[1,2] = xi_1_raw / theta_1_sd[2];
     sigma_1 = rep_row_vector(1,2) ./ theta_1_sd;
 
  //   c_1 = c[1:2] ./ theta_1_sd';
@@ -769,9 +771,11 @@ transformed parameters {
 
   alpha_2_tilde[1,] = -theta_2_mean ./ theta_2_sd;
   alpha_2_tilde[2:X_num,] = alpha_2_tilde_raw ./ (rep_vector(1,X_num - 1) * theta_2_sd);
-  beta_2  = beta_2_raw ./ theta_2_sd[2:3];
+  beta_2[1] = 0;
+  beta_2[2:3]  = beta_2_raw ./ theta_2_sd[2:3];
   gamma_2 = gamma_2_ ./ (rep_vector(1,2) * theta_2_sd);
-  delta_2 = delta_2_raw ./ theta_2_sd[2:3];
+  delta_2[1] = 0;
+  delta_2[2:3] = delta_2_raw ./ theta_2_sd[2:3];
   xi_2    = xi_2_ ./ (rep_vector(1,2) * theta_2_sd);
   sigma_2 = rep_row_vector(1,3) ./ theta_2_sd;
 

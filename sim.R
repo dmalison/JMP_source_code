@@ -66,8 +66,6 @@ X <- matrix(as.numeric(X), nrow = dim(X)[1], ncol = dim(X)[2], dimnames = list(N
 # Turn X into numeric matrix to make it easier to analyze and load into stan
 X_num <- ncol(X)
 
-R_0 <- data_raw$R_0
-
 # Extract parameters from fit_stan -----------------------------------------
 
 for (i in parNames){
@@ -78,7 +76,7 @@ for (i in parNames){
 
 # Simulate structural process -----------------------------------------------
 
-#lambda <- rmvnorm(N, sigma = matrix(corr_lambda, nrow = 4))
+R_0 <- data_raw$R_0 # use observed initial relationship status
 
 # theta_0
 
@@ -106,9 +104,9 @@ data_raw$R_1 <- R_1
 
 theta_1 <- 
   X %*% alpha_1 +
-  rep(c(0, beta_1), each = N)*rep(R_0*(1-R_1),2) +
-  rep(c(0, delta_1), each = N)*rep(R_1,2) + 
-  rep(theta_0, 2) * cbind(gamma_1[1], xi_1*R_1 + gamma_1[2]*(1-R_1)) + 
+  (R_0*(1-R_1)) %*% beta_1 +
+  R_1 %*% delta_1 + 
+  (theta_0 %*% gamma_1)*(1-R_1) + (theta_0 %*% xi_1)*R_1 +
   rmvnorm(N, sigma = diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
   
 theta_1[,1] <- theta_1[,1]*R_1
@@ -131,9 +129,9 @@ R_2 <-
 
 theta_2 <- 
   X %*% alpha_2 +
-  rep(c(0, beta_2), each = N)*rep(R_1*(1-R_2),3) +
-  rep(c(0, delta_2), each = N)*rep(R_2,3) + 
-  (theta_1 %*% gamma_2) * rep((1-R_2),each = 3) + (theta_1 %*% cbind(gamma_2[,1],rbind(xi_2,0))) * rep(R_2, each = 3) +
+  (R_1*(1-R_2)) %*% beta_2 +
+  R_2 %*% delta_2 + 
+  (theta_1 %*% gamma_2)*c(1-R_2) + (theta_1 %*% xi_2)*c(R_2) +
   rmvnorm(N, sigma = diag(as.vector(sigma_2)) %*% corr_2 %*% diag(as.vector(sigma_2)))
 
 theta_2[,1] <- theta_2[,1]*R_2
@@ -525,14 +523,14 @@ fit_stan = stan(
             "theta_1", "theta_2" #, "theta_3", "theta_4",
    ),
   include = T,
-  chains = 1,
-  iter = 10,
-  warmup = 5,
-  refresh = 1,
-  # chains = 8,
-  # iter = 750,
-  # warmup = 500,
-  # refresh = 10,
+  # chains = 1,
+  # iter = 10,
+  # warmup = 5,
+  # refresh = 1,
+  chains = 8,
+  iter = 750,
+  warmup = 500,
+  refresh = 10,
   init_r = .5,
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
