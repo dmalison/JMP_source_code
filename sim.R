@@ -84,7 +84,6 @@ for (i in parNames){
 
 theta_0 <-
   (X %*% alpha_0 +
-#  c_0[1]*lambda[,1] +
   rnorm(N, sd = sigma_0))*R_0
 
 colnames(theta_0) <- "R"
@@ -128,9 +127,18 @@ R_2 <-
     ) > 0
   )*R_1
 
-R_2[which(is.na(data_raw$R_2))] <- NA
+# theta_2
 
-data_raw$R_2 <- R_2
+theta_2 <- 
+  X %*% alpha_2 +
+  rep(c(0, beta_2), each = N)*rep(R_1*(1-R_2),3) +
+  rep(c(0, delta_2), each = N)*rep(R_2,3) + 
+  (theta_1 %*% gamma_2) * rep((1-R_2),each = 3) + (theta_1 %*% cbind(gamma_2[,1],rbind(xi_2,0))) * rep(R_2, each = 3) +
+  rmvnorm(N, sigma = diag(as.vector(sigma_2)) %*% corr_2 %*% diag(as.vector(sigma_2)))
+
+theta_2[,1] <- theta_2[,1]*R_2
+
+colnames(theta_2) <- c("R", "N", "C")
 
 # Simulate measurements ---------------------------------------------------
 
@@ -170,17 +178,20 @@ M_frame <-
     variable = 
       c(
         "R", 
+        "R","R","N",
         "R","R","N"
       ),
     period = 
       c(
         0,
-        1,1,1
+        1,1,1,
+        2,2,2
       ),
     n_cat = 
       c(
         3,
-        3,5,5
+        3,5,5,
+        3,5,3
       )
   )
 
@@ -190,6 +201,15 @@ for (i in 1:nrow(M_frame)){
   
   rm(i)
 }
+
+M_C_2_1 <-
+  c(stan_data$mu_M_C_2_mean) + 10.25 * theta_2[,3] + rnorm(N, sd = stan_data$sigma_M_C_2_mean)
+
+M_C_2_1[setdiff(1:N,stan_data$I_C_2_ind)] <- NA
+
+data_raw$M_C_2_1 <- M_C_2_1
+
+rm(M_C_2_1)
 
 # Turn simulated measurements into concatenated vectors -------------------
 
@@ -249,7 +269,16 @@ extract <- function(variable, period, n_cat){
   
   rm(pos)
   
-  list(name = name, num = num, I_num = I_num, I_ind = I_ind, M = M_)
+  assign(paste(name, "num", sep = "_"), num, envir = globalenv())
+  assign(paste("I", name, "num", sep = "_"), I_num, envir = globalenv())
+  assign(paste("I", name, "ind", sep = "_"), I_ind, envir = globalenv())
+  assign(paste("M", name, sep = "_"), M_, envir = globalenv())
+  
+  # if (M_frame[i,1] == "anchor"){
+  #   assign(M_$name, M_$M, envir = globalenv())
+  # } else {
+  #   assign(paste("M", M_$name, sep = "_"), M_$M, envir = globalenv())
+  # }
   
 }
 
@@ -262,21 +291,15 @@ extract <- function(variable, period, n_cat){
 
 for (i in 1:nrow(M_frame)){
   
-  M_ <- extract(M_frame[i,1], M_frame[i,2], M_frame[i,3])
+  extract(M_frame[i,1], M_frame[i,2], M_frame[i,3])
   
-  assign(paste(M_$name, "num", sep = "_"), M_$num)
-  assign(paste("I", M_$name, "num", sep = "_"), M_$I_num)
-  assign(paste("I", M_$name, "ind", sep = "_"), M_$I_ind)
-  
-  if (M_frame[i,1] == "anchor"){
-    assign(M_$name, M_$M)
-  } else {
-    assign(paste("M", M_$name, sep = "_"), M_$M)
-  }
-  
-  rm(i, M_)
+  rm(i)
   
 }
+
+extract("C",2,NA)
+
+# Construct priors --------------------------------------------------------
 
 M_prior <- function(variable, period, n_cat) {
   
@@ -341,7 +364,10 @@ M_prior <- function(variable, period, n_cat) {
   }
   rm(i, M_frame)
 }
-# Extract indicators ------------------------------------------------------
+# Extract romantic involvement indicators ------------------------------------------------------
+
+R_2[which(is.na(data_raw$R_2))] <- NA
+data_raw$R_2 <- R_2
 
 # *_N: Number of non-missing observations who were in a relationship in previous period
 # *_ind: Indices of non-missing observations who were in a relationship in previous period 
@@ -389,18 +415,18 @@ for (i in 1:2){
       #      "corr_lambda", "c", 
       "alpha_0", "sigma_0", #"c_0",
       "alpha_1", "beta_1", "gamma_1", "delta_1", "xi_1", "corr_1", "sigma_1", #"c_1",
-      # "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
+      "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
       # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", #"c_3",
       # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", #"c_4", 
       "alpha_p", "gamma_p_", #"c_p",
       "gamma_M_R_0_cat3", "c_M_R_0_cat3",
       "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
       "gamma_M_R_1_cat5", "c_M_R_1_cat5",
-      "gamma_M_N_1_cat5", "c_M_N_1_cat5"
-      # "gamma_M_R_2_cat3", "c_M_R_2_cat3", 
-      # "gamma_M_R_2_cat5", "c_M_R_2_cat5",
-      # "gamma_M_N_2_cat3", "c_M_N_2_cat3",
-      # "mu_M_C_2", "sigma_M_C_2", "gamma_M_C_2",
+      "gamma_M_N_1_cat5", "c_M_N_1_cat5",
+      "gamma_M_R_2_cat3", "c_M_R_2_cat3",
+      "gamma_M_R_2_cat5", "c_M_R_2_cat5",
+      "gamma_M_N_2_cat3", "c_M_N_2_cat3"
+      # "mu_M_C_2", "sigma_M_C_2", "gamma_M_C_2"
       # "gamma_M_R_3_cat3", "c_M_R_3_cat3", 
       # "gamma_M_R_3_cat5", "c_M_R_3_cat5",
       # "gamma_M_N_3_cat3", "c_M_N_3_cat3",
@@ -422,13 +448,19 @@ for (i in 1:2){
   
   for (i in 
        c("theta_0", 
-         "theta_1")) {
+         "theta_1",
+         "theta_2")) {
     latentTrue[[i]] <- get(i)
     rm(i)
   }
   
 }
 {
+  dim(I_C_2_num) <- 1
+  
+  mu_M_C_2_mean <- stan_data$mu_M_C_2_mean
+  sigma_M_C_2_mean <- stan_data$sigma_M_C_2_mean
+
 stan_data <- list()
 
 for (i in 
@@ -438,10 +470,10 @@ for (i in
        "R_1_cat3_num", "I_R_1_cat3_num", "I_R_1_cat3_ind", "M_R_1_cat3",
        "R_1_cat5_num", "I_R_1_cat5_num", "I_R_1_cat5_ind", "M_R_1_cat5",
        "N_1_cat5_num", "I_N_1_cat5_num", "I_N_1_cat5_ind", "M_N_1_cat5",
-       # "R_2_cat3_num", "I_R_2_cat3_num", "I_R_2_cat3_ind", "M_R_2_cat3",
-       # "R_2_cat5_num", "I_R_2_cat5_num", "I_R_2_cat5_ind", "M_R_2_cat5",
-       # "N_2_cat3_num", "I_N_2_cat3_num", "I_N_2_cat3_ind", "M_N_2_cat3",
-       # "C_2_num", "I_C_2_num", "I_C_2_ind", "M_C_2",
+       "R_2_cat3_num", "I_R_2_cat3_num", "I_R_2_cat3_ind", "M_R_2_cat3",
+       "R_2_cat5_num", "I_R_2_cat5_num", "I_R_2_cat5_ind", "M_R_2_cat5",
+       "N_2_cat3_num", "I_N_2_cat3_num", "I_N_2_cat3_ind", "M_N_2_cat3",
+       "C_2_num", "I_C_2_num", "I_C_2_ind", "M_C_2",
        # "R_3_cat3_num", "I_R_3_cat3_num", "I_R_3_cat3_ind", "M_R_3_cat3",
        # "R_3_cat5_num", "I_R_3_cat5_num", "I_R_3_cat5_ind", "M_R_3_cat5",
        # "N_3_cat3_num", "I_N_3_cat3_num", "I_N_3_cat3_ind", "M_N_3_cat3",
@@ -453,17 +485,17 @@ for (i in
        # "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
        "R_0_N", "R_0_ind", "R_0", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1",
        "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
-       # "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1",
+       "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1",
        # "R_3_N", "R_3_ind", "R_3", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1",
        # "R_4_N", "R_4_ind", "R_4", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1",
        "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean",
        "gamma_M_R_1_cat3_mean", "c_M_R_1_cat3_mean",
        "gamma_M_R_1_cat5_mean", "c_M_R_1_cat5_mean",
-       "gamma_M_N_1_cat5_mean", "c_M_N_1_cat5_mean"
-       # "gamma_M_R_2_cat3_mean", "c_M_R_2_cat3_mean", 
-       # "gamma_M_R_2_cat5_mean", "c_M_R_2_cat5_mean",
-       # "gamma_M_N_2_cat3_mean", "c_M_N_2_cat3_mean",
-       # "mu_M_C_2_mean", "sigma_M_C_2_mean", 
+       "gamma_M_N_1_cat5_mean", "c_M_N_1_cat5_mean",
+       "gamma_M_R_2_cat3_mean", "c_M_R_2_cat3_mean",
+       "gamma_M_R_2_cat5_mean", "c_M_R_2_cat5_mean",
+       "gamma_M_N_2_cat3_mean", "c_M_N_2_cat3_mean",
+       "mu_M_C_2_mean", "sigma_M_C_2_mean"
        # "gamma_M_R_3_cat3_mean", "c_M_R_3_cat3_mean", 
        # "gamma_M_R_3_cat5_mean", "c_M_R_3_cat5_mean",
        # "gamma_M_N_3_cat3_mean", "c_M_N_3_cat3_mean",
@@ -490,17 +522,17 @@ fit_stan = stan(
    pars = c(parNames,
   #          #           "lambda",
             "theta_0", 
-            "theta_1" # "theta_2", "theta_3", "theta_4",
+            "theta_1", "theta_2" #, "theta_3", "theta_4",
    ),
   include = T,
-  # chains = 1,
-  # iter = 10,
-  # warmup = 5,
-  # refresh = 1,
-  chains = 8,
-  iter = 750,
-  warmup = 500,
-  refresh = 10,
+  chains = 1,
+  iter = 10,
+  warmup = 5,
+  refresh = 1,
+  # chains = 8,
+  # iter = 750,
+  # warmup = 500,
+  # refresh = 10,
   init_r = .5,
   control = list(max_treedepth = 10, adapt_delta = .8)
 )
