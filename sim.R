@@ -138,6 +138,19 @@ theta_2[,1] <- theta_2[,1]*R_2
 
 colnames(theta_2) <- c("R", "N", "C")
 
+# R_3
+
+R_3 <-
+  (
+    (
+      X %*% alpha_p[,3] +
+        gamma_p_[1,3] * theta_2[,1] +
+        gamma_p_[2,3] * theta_2[,1]^2 -
+        rnorm(N)
+    ) > 0
+  )*R_2
+
+
 # Simulate measurements ---------------------------------------------------
 
 M_sim <- function(variable, period, n_cat){
@@ -367,6 +380,9 @@ M_prior <- function(variable, period, n_cat) {
 R_2[which(is.na(data_raw$R_2))] <- NA
 data_raw$R_2 <- R_2
 
+R_3[which(is.na(data_raw$R_3))] <- NA
+data_raw$R_3 <- R_3
+
 # *_N: Number of non-missing observations who were in a relationship in previous period
 # *_ind: Indices of non-missing observations who were in a relationship in previous period 
 # *: Observed choices for non-missing observations who were in a relationship in previous period
@@ -383,7 +399,7 @@ R_0_ind1 = which(R_0 == 1)
 R_0_N0 = sum(R_0 == 0, na.rm = T)
 R_0_ind0 = which(R_0 == 0)
 
-for (i in 1:2){
+for (i in 1:3){
 
   # create local names
 
@@ -484,7 +500,7 @@ for (i in
        "R_0_N", "R_0_ind", "R_0", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1",
        "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
        "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1",
-       # "R_3_N", "R_3_ind", "R_3", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1",
+       "R_3_N", "R_3_ind", "R_3", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1",
        # "R_4_N", "R_4_ind", "R_4", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1",
        "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean",
        "gamma_M_R_1_cat3_mean", "c_M_R_1_cat3_mean",
