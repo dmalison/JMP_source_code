@@ -8,7 +8,7 @@ load('~/bin/JMP/work/fit')
 # library("shinystan")
 # launch_shinystan(fit_stan)
 
-traceplot(fit_stan, "lp__", inc_warmup = F)
+traceplot(fit_stan, "lp__", inc_warmup = T)
 
 k = 1
 i = parNames[k]

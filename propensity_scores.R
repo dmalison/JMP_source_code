@@ -29,7 +29,7 @@ for (i in 0:4){
 
 # Extract parameters from fit_stan ------------------------------------------------------
 
-for (i in c(parNames, "theta_0", "theta_1")){
+for (i in c(parNames, "theta_0", "theta_1", "theta_2")){
   x <- extract(fit_stan, pars = i)[[1]]
   assign(i,x)
   rm(i,x)
@@ -37,7 +37,7 @@ for (i in c(parNames, "theta_0", "theta_1")){
 
 # Construct propensity scores ----------------------------------------------
 
-for (i in 1:2){
+for (i in 1:3){
   
   theta_R = get(paste("theta", i-1, sep = "_"))[,,1]
   
