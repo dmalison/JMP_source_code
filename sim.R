@@ -106,7 +106,7 @@ theta_1 <-
   X %*% alpha_1 +
   (R_0*(1-R_1)) %*% beta_1 +
   R_1 %*% delta_1 + 
-  (theta_0 %*% gamma_1)*(1-R_1) + (theta_0 %*% xi_1)*R_1 +
+  (theta_0 %*% gamma_1)*c(1-R_1) + (theta_0 %*% xi_1)*c(R_1) +
   rmvnorm(N, sigma = diag(as.vector(sigma_1)) %*% corr_1 %*% diag(as.vector(sigma_1)))
   
 theta_1[,1] <- theta_1[,1]*R_1
@@ -413,9 +413,9 @@ for (i in 1:2){
       #      "corr_lambda", "c", 
       "alpha_0", "sigma_0", #"c_0",
       "alpha_1", "beta_1", "gamma_1", "delta_1", "xi_1", "corr_1", "sigma_1", #"c_1",
-      "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", #"c_2",
-      # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", #"c_3",
-      # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", #"c_4", 
+      "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", "sigma_2", #"c_2",
+      # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", "sigma_3",  #"c_3",
+      # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", "sigma_4",  #"c_4", 
       "alpha_p", "gamma_p_", #"c_p",
       "gamma_M_R_0_cat3", "c_M_R_0_cat3",
       "gamma_M_R_1_cat3", "c_M_R_1_cat3", 

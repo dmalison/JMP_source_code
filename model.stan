@@ -729,7 +729,9 @@ transformed parameters {
   gamma_2_[1,1]      = gamma_2_raw[1];
   gamma_2_[1,2:3]    = gamma_2_raw[2:3];
   gamma_2_[2,2:3]    = gamma_2_raw[4:5];
+  xi_2_[1,1]   = gamma_2_raw[1];
   xi_2_[1,2:3] = xi_2_raw;
+  xi_2_[2,2:3] = gamma_2_raw[4:5];
 
   /* generate unnormalized latent variables */
 
