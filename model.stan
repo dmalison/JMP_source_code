@@ -183,13 +183,13 @@ data {
 
     /*** R_3 ***/
 
-    // int<lower = 0, upper = N> R_3_N;
-    // int<lower = 0, upper = N> R_3_ind[R_3_N];
-    // int<lower = 0, upper = 1> R_3[R_3_N];
-    // int<lower = 0, upper = N> R_3_N0;
-    // int<lower = 0, upper = N> R_3_ind0[R_3_N0];
-    // int<lower = 0, upper = N> R_3_N1;
-    // int<lower = 0, upper = N> R_3_ind1[R_3_N1];
+    int<lower = 0, upper = N> R_3_N;
+    int<lower = 0, upper = N> R_3_ind[R_3_N];
+    int<lower = 0, upper = 1> R_3[R_3_N];
+    int<lower = 0, upper = N> R_3_N0;
+    int<lower = 0, upper = N> R_3_ind0[R_3_N0];
+    int<lower = 0, upper = N> R_3_N1;
+    int<lower = 0, upper = N> R_3_ind1[R_3_N1];
 
     /*** R_4 ***/
     
@@ -283,20 +283,20 @@ transformed data {
   vector[N] R_0_full;
   vector[N] R_1_full; 
   vector[N] R_2_full;
-  // vector[N] R_3_full;
+  vector[N] R_3_full;
   // vector[N] R_4_full;
 
   /*** prior parameters ***/
 
   real normal_mu_prior = 0; // prior mean for standardized coefficients 
-  real<lower = 0> normal_sigma_prior = 1.5; // prior variance for standardized coefficients and threshold parameters
+  real<lower = 0> normal_sigma_prior = 2; // prior variance for standardized coefficients and threshold parameters
   
   real lkj_sd_prior = .5; // prior standard deviation for correlation parameters
   real lkj_eta_prior_2 = .5/square(lkj_sd_prior)*(1 - square(lkj_sd_prior)); // convert sd to eta parameter
   real lkj_eta_prior_3 = .5/square(lkj_sd_prior)*(1 - 2*square(lkj_sd_prior)); 
   real lkj_eta_prior_4 = .5/square(lkj_sd_prior)*(1 - 3*square(lkj_sd_prior));   
   
-  real gamma_sd_prior = 1; // prior standard deviation for factor loading and st dev parameters
+  real gamma_sd_prior = 1.5; // prior standard deviation for factor loading and st dev parameters
   
     /*** theta_0 ***/
   
@@ -390,8 +390,8 @@ transformed data {
     R_1_full[R_1_ind]  = to_vector(R_1);
     R_2_full[R_1_ind0] = rep_vector(0, R_1_N0);
     R_2_full[R_2_ind]  = to_vector(R_2);
-    // R_3_full[R_2_ind0] = rep_vector(0, R_2_N0);
-    // R_3_full[R_3_ind]  = to_vector(R_3);
+    R_3_full[R_2_ind0] = rep_vector(0, R_2_N0);
+    R_3_full[R_3_ind]  = to_vector(R_3);
     // R_4_full[R_3_ind0] = rep_vector(0, R_3_N0);
     // R_4_full[R_4_ind]  = to_vector(R_4);
 
@@ -535,8 +535,8 @@ parameters {
 
 /*** relationship indicators ***/
 
-  matrix[X_num,2] alpha_p_tilde;
-  matrix[2,2] gamma_p_;
+  matrix[X_num,3] alpha_p_tilde;
+  matrix[2,3] gamma_p_;
 
 /*** anchors ***/
   
@@ -1180,17 +1180,17 @@ model {
 
   /*** R_3 ***/
  
-  //   R_3 ~ 
-  //     bernoulli(
-  //       Phi_approx(
-  //         X_Q[R_3_ind,] * alpha_p_tilde[,3] +
-  //         theta_2[R_3_ind,1] * gamma_p_[1,3] +
-  //         square(theta_2[R_3_ind,1]) * gamma_p_[2,3] // +
-  // //        lambda[R_3_ind,1] * c_p[3] // + 
-  // //        lambda[R_3_ind,4] * c[4]
-  //       )
-  //     );
-  // 
+    R_3 ~
+      bernoulli(
+        Phi_approx(
+          X_Q[R_3_ind,] * alpha_p_tilde[,3] +
+          theta_2[R_3_ind,1] * gamma_p_[1,3] +
+          square(theta_2[R_3_ind,1]) * gamma_p_[2,3] // +
+  //        lambda[R_3_ind,1] * c_p[3] // +
+  //        lambda[R_3_ind,4] * c[4]
+        )
+      );
+
   
   /*** R_4 ***/
   
@@ -1412,7 +1412,7 @@ generated quantities {
   // matrix[X_num,2] delta_3 = X_R\delta_3_tilde;
   // matrix[X_num,2] delta_4 = X_R\delta_4_tilde;
   //
-  matrix[X_num,2] alpha_p = X_R\alpha_p_tilde;
+  matrix[X_num,3] alpha_p = X_R\alpha_p_tilde;
 
 //  matrix[X_num,anchor_num] alpha_anchor = X_R\alpha_anchor_tilde;
 
