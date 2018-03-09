@@ -190,6 +190,7 @@ data {
     int<lower = 0, upper = N> R_3_ind0[R_3_N0];
     int<lower = 0, upper = N> R_3_N1;
     int<lower = 0, upper = N> R_3_ind1[R_3_N1];
+    int<lower = 0, upper = N> R_3_ind_nomiss[R_3_N0 + R_3_N1];
 
     /*** R_4 ***/
     
@@ -230,8 +231,8 @@ data {
     vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3_mean;
     ordered[2] c_M_N_2_cat3_mean[N_2_cat3_num];
 
-    vector[1] mu_M_C_2_mean;
-    vector<lower = 0>[1] sigma_M_C_2_mean;
+    vector[C_2_num] mu_M_C_2_mean;
+    vector<lower = 0>[C_2_num] sigma_M_C_2_mean;
 
     /*** theta_3 ***/
 
@@ -833,16 +834,16 @@ transformed parameters {
   /* normalize latent variables */
 
   theta_3_mean[1] = mean(theta_R_3);
-  theta_3_mean[2] = mean(theta_NC_3[,1]);
-  theta_3_mean[3] = mean(theta_NC_3[,2]);
+  theta_3_mean[2] = mean(theta_NC_3[R_3_ind_nomiss,1]);
+  theta_3_mean[3] = mean(theta_NC_3[R_3_ind_nomiss,2]);
 
   theta_3_sd[1] = sd(theta_R_3);
-  theta_3_sd[2] = sd(theta_NC_3[,1]);
-  theta_3_sd[3] = sd(theta_NC_3[,2]);
+  theta_3_sd[2] = sd(theta_NC_3[R_3_ind_nomiss,1]);
+  theta_3_sd[3] = sd(theta_NC_3[R_3_ind_nomiss,2]);
 
   theta_3[R_3_ind1,1] = (theta_R_3 - theta_3_mean[1])/theta_3_sd[1];
-  theta_3[,2]         = (theta_NC_3[,1] - theta_3_mean[2])/theta_3_sd[2];
-  theta_3[,3]         = (theta_NC_3[,2] - theta_3_mean[3])/theta_3_sd[3];
+  theta_3[R_3_ind_nomiss,2] = (theta_NC_3[R_3_ind_nomiss,1] - theta_3_mean[2])/theta_3_sd[2];
+  theta_3[R_3_ind_nomiss,3] = (theta_NC_3[R_3_ind_nomiss,2] - theta_3_mean[3])/theta_3_sd[3];
 
   /* normalize parameters */
 
@@ -941,6 +942,9 @@ transformed parameters {
   
   gamma_M_C_2[1] = 10.25;
   gamma_M_C_3[1] = 10.25;
+  gamma_M_C_3[2] = gamma_M_C_3_2;
+  sigma_M_C_3[2] = sigma_M_C_3_2;
+
 
 }
 model {
