@@ -213,6 +213,7 @@ for (i in 1:4){
   
 }
 
+R_2_ind_nomiss = c(R_2_ind0, R_2_ind1)
 R_3_ind_nomiss = c(R_3_ind0, R_3_ind1)
 
 # Construct prior parameters --------------------------------------------------------
@@ -398,7 +399,7 @@ M_prior <- function(variable, period, n_cat) {
          "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
          "R_0_N", "R_0_ind", "R_0", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1",
          "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
-         "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1",
+         "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1", "R_2_ind_nomiss",
          "R_3_N", "R_3_ind", "R_3", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1", "R_3_ind_nomiss",
          "R_4_N", "R_4_ind", "R_4", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1", #"R_4_ind_nomiss",
          "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean",
@@ -440,14 +441,14 @@ fit_stan = stan(
            "theta_3"#, "theta_4"
   ),
   include = T,
-  # chains = 1,
-  # iter = 10,
-  # warmup = 5,
-  # refresh = 1,
-  chains = 8,
-  iter = 750,
-  warmup = 500,
-  refresh = 10,
+  chains = 1,
+  iter = 10,
+  warmup = 5,
+  refresh = 1,
+  # chains = 8,
+  # iter = 750,
+  # warmup = 500,
+  # refresh = 10,
   init_r = .5,
   control = list(max_treedepth = 10, adapt_delta = .8)
 )

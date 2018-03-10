@@ -180,6 +180,7 @@ data {
     int<lower = 0, upper = N> R_2_ind0[R_2_N0];
     int<lower = 0, upper = N> R_2_N1;
     int<lower = 0, upper = N> R_2_ind1[R_2_N1];
+    int<lower = 0, upper = N> R_2_ind_nomiss[R_2_N0 + R_2_N1];
 
     /*** R_3 ***/
 
@@ -757,16 +758,16 @@ transformed parameters {
   /* normalize latent variables */
 
   theta_2_mean[1] = mean(theta_R_2);
-  theta_2_mean[2] = mean(theta_NC_2[,1]);
-  theta_2_mean[3] = mean(theta_NC_2[,2]);
+  theta_2_mean[2] = mean(theta_NC_2[R_2_ind_nomiss,1]);
+  theta_2_mean[3] = mean(theta_NC_2[R_2_ind_nomiss,2]);
 
   theta_2_sd[1] = sd(theta_R_2);
-  theta_2_sd[2] = sd(theta_NC_2[,1]);
-  theta_2_sd[3] = sd(theta_NC_2[,2]);
+  theta_2_sd[2] = sd(theta_NC_2[R_2_ind_nomiss,1]);
+  theta_2_sd[3] = sd(theta_NC_2[R_2_ind_nomiss,2]);
 
   theta_2[R_2_ind1,1] = (theta_R_2 - theta_2_mean[1])/theta_2_sd[1];
-  theta_2[,2]         = (theta_NC_2[,1] - theta_2_mean[2])/theta_2_sd[2];
-  theta_2[,3]         = (theta_NC_2[,2] - theta_2_mean[3])/theta_2_sd[3];
+  theta_2[R_2_ind_nomiss,2] = (theta_NC_2[R_2_ind_nomiss,1] - theta_2_mean[2])/theta_2_sd[2];
+  theta_2[R_2_ind_nomiss,3] = (theta_NC_2[R_2_ind_nomiss,2] - theta_2_mean[3])/theta_2_sd[3];
 
   /* normalize parameters */
 
