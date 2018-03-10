@@ -25,6 +25,10 @@ k = k + 1
 theta_3 <- colMeans(extract(fit_stan, "theta_3")[[1]])
 theta_2 <- colMeans(extract(fit_stan, "theta_2")[[1]])
 
+which(theta_3[,3] == 0)
+
+plot(theta_2[stan_data$R_3_ind1,1], theta_3[stan_data$R_3_ind1,1])
+
 hist(theta_3[which(abs(theta_3[,3]) < .02),3])
 
 table(theta_3[which(abs(theta_3[,3]) < .02),3])
