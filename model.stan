@@ -149,6 +149,7 @@ data {
       *_ind0: Indicies of observations not in a relationship this period
       *_N1: Number of observations in a relationship this period
       *_ind1: Indicies of observations in a relationship this period
+      *_ind_nomiss: Indicies of observations that are non-missing this period
     */
 
     /*** R_0 ***/
@@ -195,13 +196,14 @@ data {
 
     /*** R_4 ***/
     
-    // int<lower = 0, upper = N> R_4_N;
-    // int<lower = 0, upper = N> R_4_ind[R_4_N];
-    // int<lower = 0, upper = 1> R_4[R_4_N];
-    // int<lower = 0, upper = N> R_4_N0;
-    // int<lower = 0, upper = N> R_4_ind0[R_4_N0];
-    // int<lower = 0, upper = N> R_4_N1;
-    // int<lower = 0, upper = N> R_4_ind1[R_4_N1];
+    int<lower = 0, upper = N> R_4_N;
+    int<lower = 0, upper = N> R_4_ind[R_4_N];
+    int<lower = 0, upper = 1> R_4[R_4_N];
+    int<lower = 0, upper = N> R_4_N0;
+    int<lower = 0, upper = N> R_4_ind0[R_4_N0];
+    int<lower = 0, upper = N> R_4_N1;
+    int<lower = 0, upper = N> R_4_ind1[R_4_N1];
+    int<lower = 0, upper = N> R_4_ind_nomiss[R_4_N0 + R_4_N1];
 
   /*** prior parameters ***/
   
@@ -286,7 +288,7 @@ transformed data {
   vector[N] R_1_full; 
   vector[N] R_2_full;
   vector[N] R_3_full;
-  // vector[N] R_4_full;
+  vector[N] R_4_full;
 
   /*** prior parameters ***/
 
@@ -388,8 +390,8 @@ transformed data {
     R_2_full[R_2_ind]  = to_vector(R_2);
     R_3_full[R_2_ind0] = rep_vector(0, R_2_N0);
     R_3_full[R_3_ind]  = to_vector(R_3);
-    // R_4_full[R_3_ind0] = rep_vector(0, R_3_N0);
-    // R_4_full[R_4_ind]  = to_vector(R_4);
+    R_4_full[R_3_ind0] = rep_vector(0, R_3_N0);
+    R_4_full[R_4_ind]  = to_vector(R_4);
 
 }
 parameters {
@@ -531,8 +533,8 @@ parameters {
 
 /*** relationship indicators ***/
 
-  matrix[X_num,3] alpha_p_tilde;
-  matrix[2,3] gamma_p_;
+  matrix[X_num,4] alpha_p_tilde;
+  matrix[2,4] gamma_p_;
 
 /*** anchors ***/
   
@@ -1204,16 +1206,16 @@ model {
   
   /*** R_4 ***/
   
-  //   R_4 ~ 
-  //     bernoulli(
-  //       Phi_approx(
-  //         X_Q[R_4_ind,] * alpha_p_tilde[,4] +
-  //         theta_3[R_4_ind,1] * gamma_p_[1,4] +
-  //         square(theta_3[R_4_ind,1]) * gamma_p_[2,4] // +
-  // //        lambda[R_4_ind,1] * c_p[4] // + 
-  // //        lambda[R_4_ind,4] * c[4]
-  //       )
-  //     );
+    R_4 ~
+      bernoulli(
+        Phi_approx(
+          X_Q[R_4_ind,] * alpha_p_tilde[,4] +
+          theta_3[R_4_ind,1] * gamma_p_[1,4] +
+          square(theta_3[R_4_ind,1]) * gamma_p_[2,4] // +
+  //        lambda[R_4_ind,1] * c_p[4] // +
+  //        lambda[R_4_ind,4] * c[4]
+        )
+      );
     
 /*** measurements ***/
 
@@ -1420,7 +1422,7 @@ generated quantities {
 
   // matrix[X_num,2] delta_4 = X_R\delta_4_tilde;
   //
-  matrix[X_num,3] alpha_p = X_R\alpha_p_tilde;
+  matrix[X_num,4] alpha_p = X_R\alpha_p_tilde;
 
 //  matrix[X_num,anchor_num] alpha_anchor = X_R\alpha_anchor_tilde;
 
