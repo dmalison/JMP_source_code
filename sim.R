@@ -92,8 +92,7 @@ R_1 <-
   (
     (
       X %*% alpha_p[,1] +
-        gamma_p_[1,1] * theta_0[,1] +
-        gamma_p_[2,1] * theta_0[,1]^2 -
+        gamma_p_[1,1] * theta_0[,1] -
         rnorm(N)
     ) > 0
   )*R_0
@@ -117,8 +116,7 @@ R_2 <-
   (
     (
       X %*% alpha_p[,2] +
-        gamma_p_[1,2] * theta_1[,1] +
-        gamma_p_[2,2] * theta_1[,1]^2 -
+        gamma_p_[1,2] * theta_1[,1] -
         rnorm(N)
     ) > 0
   )*R_1
@@ -142,8 +140,7 @@ R_3 <-
   (
     (
       X %*% alpha_p[,3] +
-        gamma_p_[1,3] * theta_2[,1] +
-        gamma_p_[2,3] * theta_2[,1]^2 -
+        gamma_p_[1,3] * theta_2[,1] -
         rnorm(N)
     ) > 0
   )*R_2
@@ -166,9 +163,8 @@ colnames(theta_3) <- c("R", "N", "C")
 R_4 <-
   (
     (
-      X %*% alpha_p[,3] +
-        gamma_p_[1,3] * theta_2[,1] +
-        gamma_p_[2,3] * theta_2[,1]^2 -
+      X %*% alpha_p[,4] +
+        gamma_p_[1,4] * theta_3[,1] -
         rnorm(N)
     ) > 0
   )*R_3
@@ -603,15 +599,15 @@ fit_stan = stan(
       "theta_3" #, 
 #      "theta_4",
    ),
-  include = T,
-  chains = 1,
-  iter = 10,
-  warmup = 5,
-  refresh = 1,
-  # chains = 8,
-  # iter = 750,
-  # warmup = 500,
-  # refresh = 10,
+  # include = T,
+  # chains = 1,
+  # iter = 10,
+  # warmup = 5,
+  # refresh = 1,
+  chains = 8,
+  iter = 750,
+  warmup = 500,
+  refresh = 10,
   init_r = .5,
   control = list(max_treedepth = 10, adapt_delta = .8)
 )

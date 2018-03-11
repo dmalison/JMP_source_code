@@ -534,7 +534,7 @@ parameters {
 /*** relationship indicators ***/
 
   matrix[X_num,4] alpha_p_tilde;
-  matrix[2,4] gamma_p_;
+  vector[4] gamma_p_; // (extra undercore at end because gamma_p is a protected function)
 
 /*** anchors ***/
   
@@ -963,7 +963,7 @@ model {
 
    to_vector(alpha_p_tilde)
      ~ normal(normal_mu_prior, normal_sigma_prior);
-   to_vector(gamma_p_) ~ normal(normal_mu_prior, normal_sigma_prior);
+   gamma_p_ ~ normal(normal_mu_prior, normal_sigma_prior);
 
   /*** theta_0 ***/
   
@@ -1171,8 +1171,7 @@ model {
      bernoulli(
        Phi_approx(
         X_Q[R_1_ind] * alpha_p_tilde[,1] +
-        theta_0[R_1_ind,1] * gamma_p_[1,1] +
-        square(theta_0[R_1_ind,1]) * gamma_p_[2,1] // +
+        theta_0[R_1_ind,1] * gamma_p_[1]
   //       lambda[R_1_ind,1] * c_p[1] // +
   //       lambda[,4] * c[4]
        )
@@ -1184,8 +1183,7 @@ model {
       bernoulli(
         Phi_approx(
           X_Q[R_2_ind,] * alpha_p_tilde[,2] +
-          theta_1[R_2_ind,1] * gamma_p_[1,2] +
-          square(theta_1[R_2_ind,1]) * gamma_p_[2,2] // +
+          theta_1[R_2_ind,1] * gamma_p_[2]
   //        lambda[R_2_ind,1] * c_p[2] // +
   //        lambda[R_2_ind,4] * c[4]
       ));
@@ -1196,8 +1194,7 @@ model {
       bernoulli(
         Phi_approx(
           X_Q[R_3_ind,] * alpha_p_tilde[,3] +
-          theta_2[R_3_ind,1] * gamma_p_[1,3] +
-          square(theta_2[R_3_ind,1]) * gamma_p_[2,3] // +
+          theta_2[R_3_ind,1] * gamma_p_[3] 
   //        lambda[R_3_ind,1] * c_p[3] // +
   //        lambda[R_3_ind,4] * c[4]
         )
@@ -1210,8 +1207,7 @@ model {
       bernoulli(
         Phi_approx(
           X_Q[R_4_ind,] * alpha_p_tilde[,4] +
-          theta_3[R_4_ind,1] * gamma_p_[1,4] +
-          square(theta_3[R_4_ind,1]) * gamma_p_[2,4] // +
+          theta_3[R_4_ind,1] * gamma_p_[4] 
   //        lambda[R_4_ind,1] * c_p[4] // +
   //        lambda[R_4_ind,4] * c[4]
         )
