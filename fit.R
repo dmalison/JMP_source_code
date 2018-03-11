@@ -341,7 +341,7 @@ M_prior <- function(variable, period, n_cat) {
       "alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1", #"c_1",
       "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", "sigma_2", #"c_2",
       "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", "sigma_3", #"c_3",
-      # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", "sigma_4", #"c_4", 
+      "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", "sigma_4", #"c_4", 
       "alpha_p", "gamma_p_", #"c_p",
       "gamma_M_R_0_cat3", "c_M_R_0_cat3",
       "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
@@ -354,11 +354,11 @@ M_prior <- function(variable, period, n_cat) {
       "gamma_M_R_3_cat3", "c_M_R_3_cat3", 
       "gamma_M_R_3_cat5", "c_M_R_3_cat5",
       "gamma_M_N_3_cat3", "c_M_N_3_cat3",
-      "mu_M_C_3", "sigma_M_C_3", "gamma_M_C_3"
-      # "gamma_M_R_4_cat3", "c_M_R_4_cat3", 
-      # "gamma_M_R_4_cat5", "c_M_R_4_cat5",
-      # "gamma_M_N_4_cat3", "c_M_N_4_cat3",
-      # "mu_M_C_4", "sigma_M_C_4", "gamma_M_C_4",
+      "mu_M_C_3", "sigma_M_C_3", "gamma_M_C_3",
+      "gamma_M_R_4_cat3", "c_M_R_4_cat3",
+      "gamma_M_R_4_cat5", "c_M_R_4_cat5",
+      "gamma_M_N_4_cat3", "c_M_N_4_cat3",
+      "mu_M_C_4", "sigma_M_C_4", "gamma_M_C_4"
       # "alpha_anchor", "gamma_anchor"
     )
 }
@@ -435,11 +435,12 @@ fit_stan = stan(
   file = 'model.stan',
   data = stan_data,
   pars = c(parNames,
-           #           "lambda",
+           # "lambda",
            "theta_0", 
            "theta_1",
            "theta_2", 
-           "theta_3"#, "theta_4"
+           "theta_3",
+           "theta_4"
   ),
   include = T,
   # chains = 1,
