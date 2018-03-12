@@ -604,8 +604,6 @@ transformed parameters {
 
 /*** declare measurement parameters ***/
 
-  // gamma_M_C_2_1 and gamma_M_C_3_1 get set equal to gamma_M_C_4_1 to ensure identification
-
   vector<lower = 0>[C_2_num] gamma_M_C_2;
   vector<lower = 0>[C_3_num] gamma_M_C_3;
   
@@ -938,8 +936,12 @@ transformed parameters {
 
 /*** assign measurement parameters ***/
 
-  gamma_M_C_2[1] = gamma_M_C_4[1];
-  gamma_M_C_3[1] = gamma_M_C_4[1];
+  // gamma_M_C_2_1 and gamma_M_C_3_1 get set equal to gamma_M_C_4_1 to ensure identification
+
+  gamma_M_C_2[1] = 10.26;
+  gamma_M_C_3[1] = 10.26;
+//  gamma_M_C_2[1] = gamma_M_C_4[1];
+//  gamma_M_C_3[1] = gamma_M_C_4[1];
   gamma_M_C_3[2] = gamma_M_C_3_2;
 
 }
