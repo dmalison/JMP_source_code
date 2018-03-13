@@ -384,8 +384,8 @@ foreach var of local vars {
 
 	gen M_N_1_cat5_`i_cat5' = .
 
-	replace M_N_1_cat5_`i_cat5' = 6 - f2b16`var'  if f2b16`var' > 0 & f2b16`var' < . // Mothers who live with their children
-	replace M_N_1_cat5_`i_cat5' = 6 - f2b37`var'  if f2b37`var' > 0 & f2b37`var' < . // Mothers who do not live with their children
+	replace M_N_1_cat5_`i_cat5' = 6 - f2b16`var'  if f2b16`var' > 0 & f2b16`var' < . // Fathers who live with their children
+	replace M_N_1_cat5_`i_cat5' = 6 - f2b37`var'  if f2b37`var' > 0 & f2b37`var' < . // Fathers who do not live with their children
 
 	local i_cat5 = `i_cat5' + 1
 
@@ -569,7 +569,43 @@ egen theta_N_2 = rowmean(M_N_2_cat3*)
 gen M_C_2_1 = ppvtstd if ppvtstd > 0 
 replace M_C_2_1 = tvipstd if M_C_2_1 == . & tvipstd > 0
 
-egen theta_C_2 = std(M_C_2_1)
+gen M_C_2_2 = ppvtstd_m if ppvtstd_m > 0
+replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
+
+local vars ///
+a27a /// In past 2 weeks did child get around the house without assistance?
+a27b /// In past 2 weeks did child pick up/throw object in intended direction?
+a27c /// In past 2 weeks did child need more help eating than other of same age?
+a27d /// In past 2 weeks did child go up and down stairs without assistance? 
+a27e /// In past 2 weeks did child dress (himself/herself)?
+a27f /// In past 2 weeks did child get undressed without assistance? 
+a27g /// In past 2 weeks did child communicate with words so others can understand? 
+
+recode a27c (0 = 1) (1 = 0)
+
+local i_cat2 = 1
+
+foreach var of local vars {
+
+	gen M_C_2_cat2_`i_cat2' = .
+
+	replace M_C_2_cat2_`i_cat2' = `var' if `var' >= 0 & `var' < .
+
+	local i_cat2 = `i_cat2' + 1
+
+}
+
+egen M_C_2_3 = rowmean(M_C_2_cat2*)
+
+drop M_C_2_cat2*
+
+* standardize and average measurements
+
+egen M_C_2_1_ = std(M_C_2_1)
+egen M_C_2_2_ = std(M_C_2_2)
+
+egen theta_C_2 = rowmean(M_C_2_1_ M_C_2_2_)
+
 
 }
 *** KEEP THIRD YEAR VARIABLES ***
@@ -604,6 +640,12 @@ merge 1:1 idnum using "~/data/Fragile_Families/5_year_followup/inhome5yr2011.dta
 	 c1a-c17c ///
 	 l1-l66 ///
 	 ppvtstd ppvtstd_m wjss22 tvipstd_m ///
+	 )
+	 
+merge 1:1 idnum using "~/data/Fragile_Families/5_year_followup/ff_kteachersurvey_fnlpub.dta", nogen ///
+	 keepusing( ///
+	 kind_a5-kind_a7 ///
+	 kind_b1a-kind_b1i ///
 	 )
 }
 *** GENERATE FIFTH YEAR RELATIONSHIP STATUS ***
@@ -819,12 +861,43 @@ replace M_C_3_1 = tvipstd if M_C_3_1 == . & tvipstd > 0
 
 gen M_C_3_2 = wjss22 if wjss22 > 0
 
+local vars ///
+kind_a5  /// How would you rate the child in language and literacy skills? 
+kind_a6  /// How would you rate the child in science and social studies? 
+kind_a7  /// How would you rate the child in mathematical skills?
+kind_b1a /// Understands and interprets a story or other text read to him/her
+kind_b1b /// Easily and quickly names all upper– and lower-case letters of the alphabet.
+kind_b1c /// Reads simple books independently
+kind_b1d /// Demonstrates an understanding of some of the conventions of print 
+kind_b1e /// Recognizes distinct differences in habits and living patterns between him/herself and other groups of people he/she knows 
+kind_b1f /// Forms explanations based on observations and explorations 
+kind_b1g /// Sorts, classifies, and compares math materials by various rules and attributes 
+kind_b1h /// Shows an understanding of the relationship between quantities 
+kind_b1i /// Uses a variety of strategies to solve math problems 
+
+local i_cat5 = 1
+
+foreach var of local vars {
+
+	gen M_C_3_cat5_`i_cat5' = .
+
+	replace M_C_3_cat5_`i_cat5' = `var' if `var' >= 0 & `var' <= 5
+
+	local i_cat5 = `i_cat5' + 1
+
+}
+
+egen M_C_3_3 = rowmean(M_C_3_cat5*)
+
+drop M_C_3_cat5*
+
 * standardize and average measurements
 
 egen M_C_3_1_ = std(M_C_3_1)
 egen M_C_3_2_ = std(M_C_3_2)
+egen M_C_3_3_ = std(M_C_3_3)
 
-egen theta_C_3 = rowmean(M_C_3_1_ M_C_3_2_)
+egen theta_C_3 = rowmean(M_C_3_1_ M_C_3_2_ M_C_3_3_)
 
 drop M_C_3_?_
 
