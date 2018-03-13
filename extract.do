@@ -606,6 +606,7 @@ egen M_C_2_2_ = std(M_C_2_2)
 
 egen theta_C_2 = rowmean(M_C_2_1_ M_C_2_2_)
 
+drop M_C_2_?_
 
 }
 *** KEEP THIRD YEAR VARIABLES ***

@@ -57,7 +57,40 @@ X_num <- ncol(X)
 
 # Extract measurements ---------------------------------------------------
 
-extract <- function(variable, period, n_cat){
+mFrame <- # contains variable, period, and number of categories for all measurements
+  data.frame(
+    variable = 
+      c(
+        "R", 
+        "R", "R", "N", 
+        "R", "R", "N", "C",
+        "R", "R", "N", "C", 
+        "R", "R", "N", "C",
+        "anchor"
+      ),
+    period = 
+      c(
+        0,
+        1, 1, 1,
+        2, 2, 2, 2,
+        3, 3, 3, 3,
+        4, 4, 4, 4,
+        NA
+      ),
+    n_cat = 
+      c(
+        3, 
+        3, 5, 5, 
+        3, 5, 3, NA, 
+        3, 5, 3, NA,
+        3, 5, 3, NA,
+        NA
+      )
+  )
+
+mExtract <- function(mData){
+  
+  attach(mData)
   
   # turns measurements from raw data into objects that can be analyzed by Stan
   
@@ -113,63 +146,26 @@ extract <- function(variable, period, n_cat){
   
   rm(pos)
   
-  list(name = name, num = num, I_num = I_num, I_ind = I_ind, M = M_)
+  assign(paste(name, "num", sep = "_"), num, envir = globalenv())
+  assign(paste("I", name, "num", sep = "_"), I_num, envir = globalenv())
+  assign(paste("I", name, "ind", sep = "_"), I_ind, envir = globalenv())
+  assign(paste("M", name, sep = "_"), M_, envir = globalenv())
+  
+  detach(mData)
+  
+  # if (mFrame[i,1] == "anchor"){
+  #   assign(M_$name, M_$M)
+  # } else {
+  #   assign(paste("M", M_$name, sep = "_"), M_$M)
+  # }
   
 }
 
-M_frame <- # contains variable, period, and number of categories for all measurements
-  data.frame(
-    variable = 
-      c(
-        "R", 
-        "R", "R", "N", 
-        "R", "R", "N", "C",
-        "R", "R", "N", "C", 
-        "R", "R", "N", "C",
-        "anchor"
-      ),
-    period = 
-      c(
-        0,
-        1, 1, 1,
-        2, 2, 2, 2,
-        3, 3, 3, 3,
-        4, 4, 4, 4,
-        NA
-      ),
-    n_cat = 
-      c(
-        3, 
-        3, 5, 5, 
-        3, 5, 3, NA, 
-        3, 5, 3, NA,
-        3, 5, 3, NA,
-        NA
-      )
-  )
-
-# extract measurements
-
-# *_num: Number of measurements
-# I_*_num: Number of non-missing observations for each measurement
-# I_*_ind: Indices of non-missing observations for each measurement
-# M_*: measurements
-
-for (i in 1:nrow(M_frame)){
+for (i in 1:nrow(mFrame)){
   
-  M_ <- extract(M_frame[i,1], M_frame[i,2], M_frame[i,3])
+  mExtract(mFrame[i,])
   
-  assign(paste(M_$name, "num", sep = "_"), M_$num)
-  assign(paste("I", M_$name, "num", sep = "_"), M_$I_num)
-  assign(paste("I", M_$name, "ind", sep = "_"), M_$I_ind)
-  
-  if (M_frame[i,1] == "anchor"){
-    assign(M_$name, M_$M)
-  } else {
-    assign(paste("M", M_$name, sep = "_"), M_$M)
-  }
-  
-  rm(i, M_)
+  rm(i)
   
 }
 
@@ -219,7 +215,7 @@ R_4_ind_nomiss = c(R_4_ind0, R_4_ind1)
 
 # Construct prior parameters --------------------------------------------------------
 
-M_prior <- function(variable, period, n_cat) {
+mPrior <- function(mData) {
   
   # Constructs prior parameters for ordered logits using measurement averages as proxies
   
@@ -229,8 +225,18 @@ M_prior <- function(variable, period, n_cat) {
   
   # construct local names
   
-  name = paste(variable, period, paste("cat", n_cat, sep = ""), sep = "_")
-  M_name = paste("M", name, sep = "_")
+  attach(mData)
+  
+  if (variable == "C"){
+    name = paste(variable, period, sep = "_")
+    M_name = paste("M", name, sep = "_")
+  } else if (variable == "R" | variable == "N"){
+    name = paste(variable, period, paste("cat", n_cat, sep = ""), sep = "_")
+    M_name = paste("M", name, sep = "_")
+  } else {
+    stop("invalid variable")
+  }
+  
   theta_name = paste("theta", variable, period, sep = "_")
   
   num = # number of measurements
@@ -241,94 +247,75 @@ M_prior <- function(variable, period, n_cat) {
       )
     )
   
-  gamma_mean = rep(NA, num) # factor loading prior mean
-  c_mean = list() # threshold crossing prior mean
-  
-  eq_M = M ~ theta # ordered logit measurement equation
-  
-  theta = data_raw[[theta_name]] # use measurement average as a proxy
-  
-  # run ordered logit for each measurement
-  
-  for (m in 1:num){
+  if (variable == "C") { # prior for cognitive measurements
     
-    data = 
-      data.frame(
-        M = as.factor(data_raw[,paste(M_name, m, sep = "_")]),
-        theta = theta
+    M_cov <- # covariance matrix for period 4 cognitive measurements
+      cov(
+        data_raw[,paste(M_name, 1:num, sep = "_")], 
+        use = "pairwise.complete"
       )
     
-    polr_fit <- 
-      polr(eq_M, 
-           data = data 
-      )
+    factor_analysis <- # use factor analysis to obtain priors
+      factanal(covmat = M_cov,factors = 1)
     
-    gamma_mean[m] = polr_fit$coefficients["theta"]
-    c_mean[[m]] = polr_fit$zeta
+    assign(
+      paste("mu", M_name, "mean", sep = "_"), 
+      colMeans(data_raw[,paste(M_name, 1:num, sep = "_")], na.rm = T),
+      envir = globalenv()
+    )
+    
+    assign(
+      paste("gamma", M_name, "mean", sep = "_"), 
+      as.numeric(factor_analysis$loadings)*sqrt(diag(M_cov)),
+      envir = globalenv()
+    )
+    
+    assign(
+      paste("sigma", M_name, "mean", sep = "_"), 
+      sqrt(factor_analysis$uniquenesses*diag(M_cov)),
+      envir = globalenv()
+    )
+  } else if (variable == "R" | variable == "N") {
+    
+    gamma_mean = rep(NA, num) # factor loading prior mean
+    c_mean = list() # threshold crossing prior mean
+    
+    eq_M = M ~ theta # ordered logit measurement equation
+    
+    theta = data_raw[[theta_name]] # use measurement average as a proxy
+    
+    # run ordered logit for each measurement
+    
+    for (m in 1:num){
+      
+      data = 
+        data.frame(
+          M = as.factor(data_raw[,paste(M_name, m, sep = "_")]),
+          theta = theta
+        )
+      
+      polr_fit <- 
+        polr(eq_M, 
+             data = data 
+        )
+      
+      gamma_mean[m] = polr_fit$coefficients["theta"]
+      c_mean[[m]] = polr_fit$zeta
+      
+    }
+    
+    assign(paste("gamma_M", name, "mean", sep = "_"), gamma_mean, envir = globalenv())
+    assign(paste("c_M", name, "mean", sep = "_"), c_mean, envir = globalenv())
     
   }
   
-  list(name = name, gamma_mean = gamma_mean, c_mean = c_mean)
+  detach(mData)
   
 } 
 
-# priors for relationship quality and non-cogntive measurements
-{
-  for (i in (1:(nrow(M_frame) - 1))[-c(8,12,16)]){
-    
-    prior <- M_prior(M_frame[i,1], M_frame[i,2], M_frame[i,3])
-    
-    assign(paste("gamma_M", prior$name, "mean", sep = "_"), prior$gamma_mean)
-    assign(paste("c_M", prior$name, "mean", sep = "_"), prior$c_mean)
-    
-    rm(i, prior)
-    
-  }
-  rm(M_frame)
-}
-# prior for cognitive measurements
-{
-  # set priors for period 4 cognitive measurements
+for (i in (1:(nrow(mFrame) - 1))) mPrior(mFrame[i,])
   
-  M_C_4_cov <- # covariance matrix for period 4 cognitive measurements
-    cov(
-      data_raw[,c("M_C_4_1", "M_C_4_2", "M_C_4_3", "M_C_4_4")], 
-      use = "pairwise.complete"
-    )
-  factor_analysis <- # use factor analysis to obtain priors
-    factanal(
-      covmat = 
-        M_C_4_cov
-      , 
-      factors = 1
-    )
-  
-  mu_M_C_4_mean    <- colMeans(data_raw[,c("M_C_4_1", "M_C_4_2", "M_C_4_3", "M_C_4_4")], na.rm = T)
-  gamma_M_C_4_mean <- as.numeric(factor_analysis$loadings)*sqrt(diag(M_C_4_cov))
-  sigma_M_C_4_mean <- sqrt(factor_analysis$uniquenesses*diag(M_C_4_cov))
-  
-  rm(M_C_4_cov, factor_analysis)
-  
-  # set priors for period 3 cognitive measurement
-  
-  gamma_M_C_3_2_mean =
-    c(
-      cov(data_raw$M_C_3_1, data_raw$M_C_3_2, use = "pairwise.complete")/gamma_M_C_4_mean[1]
-    )
-  
-  mu_M_C_3_mean    = colMeans(data_raw[,c("M_C_3_1", "M_C_3_2")], na.rm = T)
-  sigma_M_C_3_mean = 
-    c(
-      sqrt(var(data_raw[,"M_C_3_1"], na.rm = T) - gamma_M_C_4_mean[1]^2) ,
-      sqrt(var(data_raw[,"M_C_3_2"], na.rm = T) - gamma_M_C_3_2_mean^2) 
-    )
-  
-  # set priors for period 2 cognitive measurement
-  
-  mu_M_C_2_mean    = mean(data_raw$M_C_2_1, na.rm = T)
-  sigma_M_C_2_mean = sqrt(var(data_raw$M_C_2_1, na.rm = T) - gamma_M_C_4_mean[1]^2)
-  
-}
+rm(mFrame)
 
 # Make lists --------------------------------------------------------------
 
@@ -367,13 +354,9 @@ M_prior <- function(variable, period, n_cat) {
   
   # set dimensions for stan 
   
-  dim(mu_M_C_2_mean) = 1
-  dim(sigma_M_C_2_mean) = 1
-  
   dim(I_R_4_cat5_num) <- 1
   dim(gamma_M_R_4_cat5_mean) <- 1
-  dim(I_C_2_num) <- 1
-  
+
   # Create stan_data object
   
   stan_data <- list()
@@ -397,7 +380,7 @@ M_prior <- function(variable, period, n_cat) {
          "R_4_cat5_num", "I_R_4_cat5_num", "I_R_4_cat5_ind", "M_R_4_cat5",   
          "N_4_cat3_num", "I_N_4_cat3_num", "I_N_4_cat3_ind", "M_N_4_cat3",
          "C_4_num", "I_C_4_num", "I_C_4_ind", "M_C_4",
-         "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
+#         "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
          "R_0_N", "R_0_ind", "R_0", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1",
          "R_1_N", "R_1_ind", "R_1", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1",
          "R_2_N", "R_2_ind", "R_2", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1", "R_2_ind_nomiss",
@@ -410,11 +393,11 @@ M_prior <- function(variable, period, n_cat) {
          "gamma_M_R_2_cat3_mean", "c_M_R_2_cat3_mean", 
          "gamma_M_R_2_cat5_mean", "c_M_R_2_cat5_mean",
          "gamma_M_N_2_cat3_mean", "c_M_N_2_cat3_mean",
-         "mu_M_C_2_mean", "sigma_M_C_2_mean", 
+         "mu_M_C_2_mean", "gamma_M_C_2_mean", "sigma_M_C_2_mean", 
          "gamma_M_R_3_cat3_mean", "c_M_R_3_cat3_mean", 
          "gamma_M_R_3_cat5_mean", "c_M_R_3_cat5_mean",
          "gamma_M_N_3_cat3_mean", "c_M_N_3_cat3_mean",
-         "mu_M_C_3_mean", "gamma_M_C_3_2_mean", "sigma_M_C_3_mean", 
+         "mu_M_C_3_mean", "gamma_M_C_3_mean", "sigma_M_C_3_mean", 
          "gamma_M_R_4_cat3_mean", "c_M_R_4_cat3_mean", 
          "gamma_M_R_4_cat5_mean", "c_M_R_4_cat5_mean",
          "gamma_M_N_4_cat3_mean", "c_M_N_4_cat3_mean",
@@ -443,14 +426,14 @@ fit_stan = stan(
            "theta_4"
   ),
   include = T,
-  # chains = 1,
-  # iter = 10,
-  # warmup = 5,
-  # refresh = 1,
-  chains = 8,
-  iter = 750,
-  warmup = 500,
-  refresh = 10,
+  chains = 1,
+  iter = 10,
+  warmup = 5,
+  refresh = 1,
+  # chains = 8,
+  # iter = 750,
+  # warmup = 500,
+  # refresh = 10,
   init_r = .5,
   control = list(max_treedepth = 10, adapt_delta = .8)
 )

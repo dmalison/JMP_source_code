@@ -235,6 +235,7 @@ data {
     ordered[2] c_M_N_2_cat3_mean[N_2_cat3_num];
 
     vector[C_2_num] mu_M_C_2_mean;
+    vector<lower = 0>[C_2_num] gamma_M_C_2_mean;
     vector<lower = 0>[C_2_num] sigma_M_C_2_mean;
 
     /*** theta_3 ***/
@@ -249,8 +250,7 @@ data {
     ordered[2] c_M_N_3_cat3_mean[N_3_cat3_num];
 
     vector[C_3_num] mu_M_C_3_mean;
-    // only include prior parameter for gamma_M_C_3_2 (gamma_M_C_3_1 assumed equal to gamma_M_C_4_1)
-    real<lower = 0> gamma_M_C_3_2_mean; 
+    vector<lower = 0>[C_3_num] gamma_M_C_3_mean; 
     vector<lower = 0>[C_3_num] sigma_M_C_3_mean;
 
     /*** theta_4 ***/
@@ -336,6 +336,9 @@ transformed data {
     vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_N_2_cat3_mean);
     vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_N_2_cat3_mean;
 
+    vector<lower = 0>[C_2_num] gamma_M_C_2_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_C_2_mean);
+    vector<lower = 0>[C_2_num] gamma_M_C_2_beta  = pow(gamma_sd_prior, -2)*gamma_M_C_2_mean;
+
     vector<lower = 0>[C_2_num] sigma_M_C_2_alpha = pow(gamma_sd_prior, -2)*square(sigma_M_C_2_mean);
     vector<lower = 0>[C_2_num] sigma_M_C_2_beta  = pow(gamma_sd_prior, -2)*sigma_M_C_2_mean;
    
@@ -350,8 +353,8 @@ transformed data {
     vector<lower = 0>[N_3_cat3_num] gamma_M_N_3_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_N_3_cat3_mean);
     vector<lower = 0>[N_3_cat3_num] gamma_M_N_3_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_N_3_cat3_mean;
 
-    real<lower = 0> gamma_M_C_3_2_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_C_3_2_mean);
-    real<lower = 0> gamma_M_C_3_2_beta  = pow(gamma_sd_prior, -2)*gamma_M_C_3_2_mean;
+    vector<lower = 0>[C_3_num] gamma_M_C_3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_C_3_mean);
+    vector<lower = 0>[C_3_num] gamma_M_C_3_beta  = pow(gamma_sd_prior, -2)*gamma_M_C_3_mean;
 
     vector<lower = 0>[C_3_num] sigma_M_C_3_alpha = pow(gamma_sd_prior, -2)*square(sigma_M_C_3_mean);
     vector<lower = 0>[C_3_num] sigma_M_C_3_beta  = pow(gamma_sd_prior, -2)*sigma_M_C_3_mean;
@@ -488,6 +491,7 @@ parameters {
 /*** M_C_2 ***/
 
   vector[C_2_num] mu_M_C_2;
+  vector<lower = 0>[C_2_num] gamma_M_C_2;
   vector<lower = 0>[C_2_num] sigma_M_C_2;
 
 /*** M_R_3 ***/
@@ -506,8 +510,8 @@ parameters {
 /*** M_C_3 ***/
 
   vector[C_3_num] mu_M_C_3;
+  vector<lower = 0>[C_3_num] gamma_M_C_3;
   vector<lower = 0>[C_3_num] sigma_M_C_3;
-  real<lower = 0> gamma_M_C_3_2;
   
 /*** M_R_4 ***/
 
@@ -524,8 +528,8 @@ parameters {
 
 /*** M_C_4 ***/
 
-  vector<lower = 0>[C_4_num] gamma_M_C_4;
   vector[C_4_num] mu_M_C_4;
+  vector<lower = 0>[C_4_num] gamma_M_C_4;
   vector<lower = 0>[C_4_num] sigma_M_C_4;
 
 /*** relationship indicators ***/
@@ -602,11 +606,6 @@ transformed parameters {
   matrix[N, 3] theta_3 = rep_matrix(0, N, 3);
   matrix[N, 3] theta_4 = rep_matrix(0, N, 3);
 
-/*** declare measurement parameters ***/
-
-  vector<lower = 0>[C_2_num] gamma_M_C_2;
-  vector<lower = 0>[C_3_num] gamma_M_C_3;
-  
 /*** assign lambda ***/
 {
   
@@ -934,16 +933,6 @@ transformed parameters {
 //  c_4 = c[1:3] ./ theta_4_sd';
 } 
 
-/*** assign measurement parameters ***/
-
-  // gamma_M_C_2_1 and gamma_M_C_3_1 get set equal to gamma_M_C_4_1 to ensure identification
-
-  gamma_M_C_2[1] = sigma_M_C_2[1];
-  gamma_M_C_3[1] = sigma_M_C_3[1];
-//  gamma_M_C_2[1] = gamma_M_C_4[1];
-//  gamma_M_C_3[1] = gamma_M_C_4[1];
-  gamma_M_C_3[2] = gamma_M_C_3_2;
-
 }
 model {
 
@@ -1064,6 +1053,7 @@ model {
   /*** M_C_2 ***/  
   
   mu_M_C_2 ~ normal(mu_M_C_2_mean, normal_sigma_prior);
+  gamma_M_C_2 ~ gamma(gamma_M_C_2_alpha, gamma_M_C_2_beta);
   sigma_M_C_2 ~ gamma(sigma_M_C_2_alpha, sigma_M_C_2_beta);
 
   /*** M_R_3 ***/  
@@ -1091,8 +1081,8 @@ model {
   /*** M_C_3 ***/  
   
   mu_M_C_3 ~ normal(mu_M_C_3_mean, normal_sigma_prior);
+  gamma_M_C_3 ~ gamma(gamma_M_C_3_alpha, gamma_M_C_3_beta);
   sigma_M_C_3 ~ gamma(sigma_M_C_3_alpha, sigma_M_C_3_beta);
-  gamma_M_C_3_2 ~ gamma(gamma_M_C_3_2_alpha, gamma_M_C_3_2_beta);
 
   /*** M_R_4 ***/  
 
@@ -1119,8 +1109,8 @@ model {
   /*** M_C_4 ***/  
   
   mu_M_C_4 ~ normal(mu_M_C_4_mean, normal_sigma_prior);
-  sigma_M_C_4 ~ gamma(sigma_M_C_4_alpha, sigma_M_C_4_beta);
   gamma_M_C_4 ~ gamma(gamma_M_C_4_alpha, gamma_M_C_4_beta);
+  sigma_M_C_4 ~ gamma(sigma_M_C_4_alpha, sigma_M_C_4_beta);
 
 /*** state variables ***/
 
