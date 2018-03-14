@@ -572,39 +572,17 @@ replace M_C_2_1 = tvipstd if M_C_2_1 == . & tvipstd > 0
 gen M_C_2_2 = ppvtstd_m if ppvtstd_m > 0
 replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
 
-local vars ///
-a27a /// In past 2 weeks did child get around the house without assistance?
-a27b /// In past 2 weeks did child pick up/throw object in intended direction?
-a27c /// In past 2 weeks did child need more help eating than other of same age?
-a27d /// In past 2 weeks did child go up and down stairs without assistance? 
-a27e /// In past 2 weeks did child dress (himself/herself)?
-a27f /// In past 2 weeks did child get undressed without assistance? 
-a27g /// In past 2 weeks did child communicate with words so others can understand? 
-
-recode a27c (0 = 1) (1 = 0)
-
-local i_cat2 = 1
-
-foreach var of local vars {
-
-	gen M_C_2_cat2_`i_cat2' = .
-
-	replace M_C_2_cat2_`i_cat2' = `var' if `var' >= 0 & `var' < .
-
-	local i_cat2 = `i_cat2' + 1
-
-}
-
-egen M_C_2_3 = rowmean(M_C_2_cat2*)
-
-drop M_C_2_cat2*
+gen M_C_2_3 = cm3cogsc if cm3cogsc > 0
+gen M_C_2_4 = cf3cogsc if cf3cogsc > 0
 
 * standardize and average measurements
 
 egen M_C_2_1_ = std(M_C_2_1)
 egen M_C_2_2_ = std(M_C_2_2)
+egen M_C_2_3_ = std(M_C_2_3)
+egen M_C_2_4_ = std(M_C_2_4)
 
-egen theta_C_2 = rowmean(M_C_2_1_ M_C_2_2_)
+egen theta_C_2 = rowmean(M_C_2_?_)
 
 drop M_C_2_?_
 
