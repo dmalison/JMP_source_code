@@ -327,8 +327,8 @@ rm(mFrame)
       "alpha_0", "sigma_0", #"c_0",
       "alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1", #"c_1",
       "alpha_2", "beta_2", "gamma_2", "xi_2", "delta_2", "corr_2", "sigma_2", #"c_2",
-#      "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", "sigma_3", #"c_3",
-#      "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", "sigma_4", #"c_4", 
+      "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", "sigma_3", #"c_3",
+      #      "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", "sigma_4", #"c_4", 
       "alpha_p", "gamma_p_", #"c_p",
       "gamma_M_R_0_cat3", "c_M_R_0_cat3",
       "gamma_M_R_1_cat3", "c_M_R_1_cat3", 
@@ -337,11 +337,11 @@ rm(mFrame)
       "gamma_M_R_2_cat3", "c_M_R_2_cat3",
       "gamma_M_R_2_cat5", "c_M_R_2_cat5",
       "gamma_M_N_2_cat3", "c_M_N_2_cat3",
-      "mu_M_C_2", "sigma_M_C_2", "gamma_M_C_2"
-     # "gamma_M_R_3_cat3", "c_M_R_3_cat3",
-     # "gamma_M_R_3_cat5", "c_M_R_3_cat5",
-     # "gamma_M_N_3_cat3", "c_M_N_3_cat3",
-      # "mu_M_C_3", "sigma_M_C_3", "gamma_M_C_3",
+      "mu_M_C_2", "sigma_M_C_2", "gamma_M_C_2",
+      "gamma_M_R_3_cat3", "c_M_R_3_cat3",
+      "gamma_M_R_3_cat5", "c_M_R_3_cat5",
+      "gamma_M_N_3_cat3", "c_M_N_3_cat3",
+      "mu_M_C_3", "sigma_M_C_3", "gamma_M_C_3"
       # "gamma_M_R_4_cat3", "c_M_R_4_cat3",
       # "gamma_M_R_4_cat5", "c_M_R_4_cat5",
       # "gamma_M_N_4_cat3", "c_M_N_4_cat3",
@@ -421,8 +421,8 @@ fit_stan = stan(
            "theta_0", 
            "theta_1",
            "theta_2", 
-           "theta_3",
-           "theta_4"
+           "theta_3" #,
+           # "theta_4"
   ),
   include = T,
   # chains = 1,
