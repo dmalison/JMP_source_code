@@ -1263,6 +1263,12 @@ forvalues i = 2/4{
 	rename theta_C_`i'_ theta_C_`i'
 }
 
+foreach var of varlist M_C_* {
+	egen `var'_ = std(`var')
+	replace `var' = `var'_
+	drop `var'_
+}
+
 foreach var of varlist M_R_2_* M_N_2_* M_C_2_*{
 
 	replace `var' = . if R_2 == .
