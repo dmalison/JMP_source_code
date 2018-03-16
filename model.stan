@@ -295,7 +295,7 @@ transformed data {
   // prior mean for standardized coefficients 
   real normal_mu_prior = 0; 
   // prior variance for standardized coefficients and threshold parameters
-  real<lower = 0> normal_sigma_prior = 2; 
+  real<lower = 0> normal_sigma_prior = 3; 
   // prior standard deviation for correlation parameters
   real lkj_sd_prior = .5; 
   // prior standard deviation for factor loading and st dev parameters

@@ -3,6 +3,12 @@
 
 # Prologue ----------------------------------------------------------------
 
+sink(file = "~/bin/JMP/work/sim3.Rout")
+
+print("Hello, world!")
+
+stop()
+
 setwd("~/bin/JMP/JMP_source_code")
 rm(list = ls())
 load("~/bin/JMP/work/fit")

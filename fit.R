@@ -1,6 +1,7 @@
 # Prologue ----------------------------------------------------------------
 
 setwd("~/bin/JMP/JMP_source_code")
+
 rm(list = ls())
 
 library("rstan")       # used to sample from posterior using MCMC
@@ -421,7 +422,11 @@ fit_stan = stan(
            "theta_0", 
            "theta_1",
            "theta_2", 
-           "theta_3" #,
+           "theta_3",
+           "gamma_3_raw",
+           "gamma_2_raw",
+           "alpha_3_tilde_raw",
+           "alpha_2_tilde_raw"
            # "theta_4"
   ),
   include = T,
@@ -434,7 +439,7 @@ fit_stan = stan(
   warmup = 500,
   refresh = 10,
   init_r = .5,
-  control = list(max_treedepth = 10, adapt_delta = .8)
+  control = list(max_treedepth = 12, adapt_delta = .8)
 )
 
 save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit")
