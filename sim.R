@@ -3,12 +3,6 @@
 
 # Prologue ----------------------------------------------------------------
 
-sink(file = "~/bin/JMP/work/sim3.Rout")
-
-print("Hello, world!")
-
-stop()
-
 setwd("~/bin/JMP/JMP_source_code")
 rm(list = ls())
 load("~/bin/JMP/work/fit")
@@ -164,16 +158,16 @@ theta_3[,1] <- theta_3[,1]*R_3
 
 colnames(theta_3) <- c("R", "N", "C")
 
-# R_4
-
-R_4 <-
-  (
-    (
-      X %*% alpha_p[,4] +
-        gamma_p_[1,4] * theta_3[,1] -
-        rnorm(N)
-    ) > 0
-  )*R_3
+# # R_4
+# 
+# R_4 <-
+#   (
+#     (
+#       X %*% alpha_p[,4] +
+#         gamma_p_[1,4] * theta_3[,1] -
+#         rnorm(N)
+#     ) > 0
+#   )*R_3
 
 # Simulate measurements ---------------------------------------------------
 
@@ -264,6 +258,164 @@ for (i in 1:nrow(M_frame)){
   
   rm(i)
 }
+
+# Extract measurements ---------------------------------------------------
+
+mFrame <- # contains variable, period, and number of categories for all measurements
+  data.frame(
+    variable = 
+      c(
+        "R", 
+        "R", "R", "N", 
+        "R", "R", "N", "C",
+        "R", "R", "N", "C" #, 
+#        "R", "R", "N", "C",
+#        "anchor"
+      ),
+    period = 
+      c(
+        0,
+        1, 1, 1,
+        2, 2, 2, 2,
+        3, 3, 3, 3 #,
+  #      4, 4, 4, 4,
+  #      NA
+      ),
+    n_cat = 
+      c(
+        3, 
+        3, 5, 5, 
+        3, 5, 3, NA, 
+        3, 5, 3, NA #,
+#        3, 5, 3, NA,
+#        NA
+      )
+  )
+
+mExtract <- function(mData){
+  
+  attach(mData)
+  
+  # turns measurements from raw data into objects that can be analyzed by Stan
+  
+  # variable: "anchor", "R", "N", or "C" - which latent variable?
+  # period: 0,1,2,3,4 - which survey wave?
+  # n_cat: 3 or 5 - how many measurement categories?
+  
+  # construct local names
+  
+  variable = as.character(variable)
+  
+  if (variable == "anchor"){
+    name = variable
+    M_name = variable
+  } else if (variable == "C"){
+    name = paste(variable, period, sep = "_")
+    M_name = paste("M", name, sep = "_")
+  } else if (variable == "R" | variable == "N"){
+    name = paste(variable, period, paste("cat", n_cat, sep = ""), sep = "_")
+    M_name = paste("M", name, sep = "_")
+  } else {
+    stop("invalid variable")
+  }
+  
+  num = # number of measurements 
+    length(
+      grep(
+        paste("^", M_name, "_*", sep = ""),
+        names(data_raw)
+      )
+    )
+  
+  I_num = NULL  # number of non-missing measurements
+  I_ind = NULL  # indicies of non-missing measurements (concatenated into a single vector)
+  
+  for (m in 1:num){
+    I_ = !is.na(data_raw[,paste(M_name, m, sep = "_")]) 
+    I_num = c(I_num, sum(I_))
+    I_ind = c(I_ind, which(I_))
+    rm(I_, m)
+  }
+  
+  M_ = rep(NA,sum(I_num)) # measurements (concatenated into a single vector)
+  
+  pos = 1
+  
+  for (m in 1:num){
+    
+    M_[pos:(pos + I_num[m] - 1)] <- data_raw[I_ind[pos:(pos + I_num[m] - 1)],paste(M_name, m, sep = "_")]
+    pos = pos + I_num[m]
+    rm(m)
+  }
+  
+  rm(pos)
+  
+  assign(paste(name, "num", sep = "_"), num, envir = globalenv())
+  assign(paste("I", name, "num", sep = "_"), I_num, envir = globalenv())
+  assign(paste("I", name, "ind", sep = "_"), I_ind, envir = globalenv())
+  assign(paste("M", name, sep = "_"), M_, envir = globalenv())
+  
+  detach(mData)
+  
+  # if (mFrame[i,1] == "anchor"){
+  #   assign(M_$name, M_$M)
+  # } else {
+  #   assign(paste("M", M_$name, sep = "_"), M_$M)
+  # }
+  
+}
+
+for (i in 1:nrow(mFrame)){
+  
+  mExtract(mFrame[i,])
+  
+  rm(i)
+  
+}
+
+# Extract indicators ------------------------------------------------------
+
+# *_N: Number of non-missing observations who were in a relationship in previous period
+# *_ind: Indices of non-missing observations who were in a relationship in previous period 
+# *: Observed choices for non-missing observations who were in a relationship in previous period
+# *_N0: Number of observations not in a relationship this period
+# *_ind0: Indicies of observations not in a relationship this period
+# *_N1: Number of observations in a relationship this period
+# *_ind1: Indicies of observations in a relationship this period
+
+R_0_N = sum(!is.na(data_raw$R_0))
+R_0_ind = which(!is.na(data_raw$R_0))
+R_0 = data_raw$R_0
+R_0_ind1 = which(R_0 == 1)
+R_0_N1 = sum(R_0 == 1, na.rm = T)
+R_0_ind0 = which(R_0 == 0)
+R_0_N0 = sum(R_0 == 0, na.rm = T)
+
+for (i in 1:4){
+  
+  # create local names
+  
+  R_name = paste("R",i,sep = "_")
+  R = data_raw[[R_name]]
+  
+  Rm1_name = paste("R",i-1,sep = "_")
+  Rm1 = data_raw[[Rm1_name]]
+  
+  assign(paste(R_name, "ind", sep = "_"), which(!is.na(R) & Rm1 == 1))
+  assign(paste(R_name, "N", sep = "_"), sum(!is.na(R) & Rm1 == 1))
+  assign(paste(R_name), R[which(!is.na(R) & Rm1 == 1)])
+  assign(paste(R_name, "ind1", sep = "_"), which(R == 1))
+  assign(paste(R_name, "N1", sep = "_"), sum(R == 1, na.rm = T))
+  assign(paste(R_name, "ind0", sep = "_"), which(R == 0))
+  assign(paste(R_name, "N0", sep = "_"), sum(R == 0, na.rm = T))
+  
+  rm(i, R_name, R, Rm1_name, Rm1)
+  
+}
+
+R_2_ind_nomiss = c(R_2_ind0, R_2_ind1)
+R_3_ind_nomiss = c(R_3_ind0, R_3_ind1)
+R_4_ind_nomiss = c(R_4_ind0, R_4_ind1)
 
 # Turn simulated measurements into concatenated vectors -------------------
 
