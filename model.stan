@@ -978,8 +978,7 @@ model {
   to_vector(alpha_3_tilde_raw)
               ~ normal(normal_mu_prior, normal_sigma_prior);
   beta_3_raw  ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_3_raw[1:6] ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_3_raw[7] ~ normal(normal_mu_prior, 5);
+  gamma_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_3_raw    ~ normal(normal_mu_prior, normal_sigma_prior);
   L_corr_3    ~ lkj_corr_cholesky(lkj_eta_prior_3);
@@ -989,8 +988,7 @@ model {
   to_vector(alpha_4_tilde_raw)
               ~ normal(normal_mu_prior, normal_sigma_prior);
   beta_4_raw  ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_4_raw[1:6] ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_4_raw[7] ~ normal(normal_mu_prior, 5);
+  gamma_4_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_4_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_4_raw    ~ normal(normal_mu_prior, normal_sigma_prior);
   L_corr_4    ~ lkj_corr_cholesky(lkj_eta_prior_3);

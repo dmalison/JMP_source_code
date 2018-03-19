@@ -572,8 +572,13 @@ replace M_C_2_1 = tvipstd if M_C_2_1 == . & tvipstd > 0
 gen M_C_2_2 = ppvtstd_m if ppvtstd_m > 0
 replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
 
-gen M_C_2_3 = cm3cogsc if cm3cogsc > 0
-gen M_C_2_4 = cf3cogsc if cf3cogsc > 0
+replace cm3cogsc = . if cm3cogsc <= 0
+replace cf3cogsc = . if cf3cogsc <= 0
+
+*egen M_C_2_3 = rowmean(cm3cogsc cf3cogsc)
+
+gen M_C_2_3 = cm3cogsc
+gen M_C_2_4 = cf3cogsc
 
 * standardize and average measurements
 
@@ -1208,7 +1213,7 @@ local covariates ///
       half_siblings ///
       female ///
       religious_m
-      
+        
 keep `covariates'  R_? theta_?_* M_?_?_* anchor* returner social_f
 }
 *** KEEP OBSERVATION FOR ANALYSIS ***
@@ -1289,9 +1294,26 @@ foreach var of varlist M_R_4_* M_N_4_* M_C_4_* anchor*{
 
 }
 
+
+egen M_temp1 = rowmean(M_C_2_3 M_C_2_4)
+
+reg M_temp1 ///
+	i.educ_cat_m ///
+	i.race_m ///
+	birthage_m ///
+	i.educ_cat_f ///
+	i.race_f ///
+	rellength ///      
+	siblings ///
+	half_siblings ///
+	female ///
+	i.religious_m
+ 
+predict M_temp, xb
+predict u, resid
+
+replace M_C_2_3 = M_temp
+
 saveold "~/data/Fragile_Families/extract/extract_noretro.dta", version(12) replace
 
-
-
- 
 

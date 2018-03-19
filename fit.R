@@ -233,14 +233,14 @@ fit_stan = stan(
            "alpha_p_tilde"
   ),
   include = T,
-  chains = 1,
-  iter = 10,
-  warmup = 5,
-  refresh = 1,
-  # chains = 8,
-  # iter = 750,
-  # warmup = 500,
-  # refresh = 10,
+  # chains = 1,
+  # iter = 10,
+  # warmup = 5,
+  # refresh = 1,
+  chains = 8,
+  iter = 750,
+  warmup = 500,
+  refresh = 10,
   init_r = .5,
   control = list(max_treedepth = 12, adapt_delta = .8)
 )
