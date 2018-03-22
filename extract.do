@@ -274,6 +274,8 @@ replace R_4 = 0 if R_1 == 0
 
 	replace F_oth_chd_wo_M = (m2c26 == 1) if m2c26 > 0 & m2c26 < . & F_oth_chd_wo_M == .
 	
+	egen half_siblings = rowmax(M_oth_chd_wo_F F_oth_chd_wo_M)
+	
 * Update father's schooling
 
 	replace educ_cat_f = 1 if (f2k1a == 2 | f2k1a == 3) & educ_cat_f == .
@@ -398,7 +400,7 @@ egen theta_N_1 = rowmean(M_N_1_cat5*)
 }
 *** KEEP FIRST YEAR VARIABLES ***
 {
-local vars1 `vars0' siblings M_R_1_* M_N_1_* theta_R_1 theta_N_1 returner social_f
+local vars1 `vars0' siblings half_siblings M_R_1_* M_N_1_* theta_R_1 theta_N_1 returner social_f
 keep `vars1'
 }
 *** MERGE THIRD YEAR FOLLOW UP ***
@@ -575,17 +577,15 @@ replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
 replace cm3cogsc = . if cm3cogsc <= 0
 replace cf3cogsc = . if cf3cogsc <= 0
 
-*egen M_C_2_3 = rowmean(cm3cogsc cf3cogsc)
+* average parents cognitive scores and use predicted values to reduce noise
 
-gen M_C_2_3 = cm3cogsc
-gen M_C_2_4 = cf3cogsc
+egen M_C_2_3 = rowmean(cm3cogsc cf3cogsc)
 
 * standardize and average measurements
 
 egen M_C_2_1_ = std(M_C_2_1)
 egen M_C_2_2_ = std(M_C_2_2)
 egen M_C_2_3_ = std(M_C_2_3)
-egen M_C_2_4_ = std(M_C_2_4)
 
 egen theta_C_2 = rowmean(M_C_2_?_)
 
@@ -1200,8 +1200,6 @@ keep `vars4'
 {
 * M or F has children with other father
 
-egen half_siblings = rowmax(M_oth_chd_wo_F F_oth_chd_wo_M)
-
 local covariates ///
       educ_cat_m ///
       race_m ///
@@ -1254,26 +1252,6 @@ forvalues i = 0/4{
 	replace theta_R_`i' = 0 if R_`i' == 0 
 }
 
-forvalues i = 1/4{
-	replace theta_N_`i' = . if R_`i' == .
-	egen theta_N_`i'_ = std(theta_N_`i')
-	drop theta_N_`i'
-	rename theta_N_`i'_ theta_N_`i'
-}
-
-forvalues i = 2/4{
-	replace theta_C_`i' = . if R_`i' == .
-	egen theta_C_`i'_ = std(theta_C_`i')
-	drop theta_C_`i'
-	rename theta_C_`i'_ theta_C_`i'
-}
-
-foreach var of varlist M_C_* {
-	egen `var'_ = std(`var')
-	replace `var' = `var'_
-	drop `var'_
-}
-
 foreach var of varlist M_R_2_* M_N_2_* M_C_2_*{
 
 	replace `var' = . if R_2 == .
@@ -1292,28 +1270,22 @@ foreach var of varlist M_R_4_* M_N_4_* M_C_4_* anchor*{
 
 }
 
+forvalues i = 1/4{
+	replace theta_N_`i' = . if R_`i' == .
+	egen theta_N_`i'_ = std(theta_N_`i')
+	drop theta_N_`i'
+	rename theta_N_`i'_ theta_N_`i'
+}
+
+forvalues i = 2/4{
+	replace theta_C_`i' = . if R_`i' == .
+	egen theta_C_`i'_ = std(theta_C_`i')
+	drop theta_C_`i'
+	rename theta_C_`i'_ theta_C_`i'
+}
+
 }
 
 
-egen M_temp1 = rowmean(M_C_2_3 M_C_2_4)
-
-reg M_temp1 ///
-	i.educ_cat_m ///
-	i.race_m ///
-	birthage_m ///
-	i.educ_cat_f ///
-	i.race_f ///
-	rellength ///      
-	siblings ///
-	half_siblings ///
-	female ///
-	i.religious_m
- 
-predict M_temp, xb
-predict u, resid
-
-replace M_C_2_3 = M_temp
-
 saveold "~/data/Fragile_Families/extract/extract_noretro.dta", version(12) replace
-
 

@@ -6,9 +6,7 @@ mExtract <- function(mData){
   # period (survey wave): 0,1,2,3,4
   # n_cat (number of measurement categories): 3 or 5
   
-  for (i in names(mData)){
-    assign(i, mData[[i]])
-  }
+  list2env(mData, environment())
   
   # Local names for easier manipulation
     # name - root name: variable_period_"cat"n_cat 

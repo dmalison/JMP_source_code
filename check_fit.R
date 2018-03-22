@@ -14,8 +14,31 @@ k = 1
 i = parNames[k]
 regex = grep(paste(paste(i,"[[].*[]]", sep = ""),"|","^",i,"$", sep = ""), names(fit_stan), value = T)
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
-traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = F)
+traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = T)
 k = k + 1
+
+i = paste("alpha_2_tilde_raw[",1:(stan_data$X_num-1), ',3]', sep = "")
+summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
+traceplot(fit_stan, pars = i, inc_warmup = T)
+
+theta_2 <- extract(fit_stan, pars = "theta_2")[[1]]
+
+theta_C_2 <- theta_2[,,3]
+apply(theta_C_2[,stan_data$R_2_ind_nomiss], 1, sd)
+
+theta_C_2_bar <- colMeans(theta_C_2[,stan_data$R_2_ind_nomiss])
+
+X <- stan_data$X
+summary(lm(theta_C_2_bar ~ X[stan_data$R_2_ind_nomiss,]))
+
+theta_C_2 = theta_2[,,3]
+theta_N_2 = theta_2[,,2]
+
+hist(apply(theta_N_2, 2, sd))
+
+hist(theta_C_2[,3])
+
+dim(theta_2)
 
 i = paste("alpha_2[",1:stan_data$X_num, ',3]', sep = "")
 traceplot(fit_stan, pars = i, inc_warmup = T)
