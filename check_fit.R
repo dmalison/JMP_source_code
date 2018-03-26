@@ -18,7 +18,7 @@ summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = T)
 k = k + 1
 
-i = paste("alpha_2_tilde_raw[",1:(stan_data$X_num-1), ',3]', sep = "")
+i = paste("alpha_3_tilde_raw[",1:(stan_data$X_num-1), ',2]', sep = "")
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = i, inc_warmup = T)
 
