@@ -10,7 +10,7 @@ rExtract <- function(period){
   
   # *_N: Number of non-missing observations who were in a relationship in previous period
   # *_ind: Indices of non-missing observations who were in a relationship in previous period 
-  # *: Observed choices for non-missing observations who were in a relationship in previous period
+  # *_: Observed choices for non-missing observations who were in a relationship in previous period
   
   # create local names
   
@@ -37,9 +37,16 @@ rExtract <- function(period){
     sum(R == 0, na.rm = T), 
     envir = globalenv()
   )
+  
   assign(
     paste(R_name, "ind", "nomiss", sep = "_"), 
     which(!is.na(R)),
+    envir = globalenv()
+  )
+  
+  assign(
+    paste(R_name, "N", "nomiss", sep = "_"), 
+    sum(!is.na(R)),
     envir = globalenv()
   )
   
@@ -50,13 +57,37 @@ rExtract <- function(period){
     
     assign(paste(R_name, "ind", sep = "_"), which(!is.na(R) & Rm1 == 1), envir = globalenv())
     assign(paste(R_name, "N", sep = "_"), sum(!is.na(R) & Rm1 == 1), envir = globalenv())
-    assign(paste(R_name), R[which(!is.na(R) & Rm1 == 1)], envir = globalenv())
+    assign(paste(R_name, "", sep = "_"), R[which(!is.na(R) & Rm1 == 1)], envir = globalenv())
+    
+    assign(
+      paste(R_name, "ind", "miss", sep = "_"), 
+      which(is.na(R) & !is.na(Rm1)),
+      envir = globalenv()
+    )
+    
+    assign(
+      paste(R_name, "N", "miss", sep = "_"), 
+      sum(is.na(R) & !is.na(Rm1)),
+      envir = globalenv()
+    )
     
   } else if (period == 0){
     
     assign(paste(R_name, "ind", sep = "_"), which(!is.na(R)), envir = globalenv())
     assign(paste(R_name, "N", sep = "_"), sum(!is.na(R)), envir = globalenv())
-    assign(paste(R_name), R[which(!is.na(R))], envir = globalenv())
+    assign(paste(R_name, "", sep = "_"), R[which(!is.na(R))], envir = globalenv())
+    
+    assign(
+      paste(R_name, "ind", "miss", sep = "_"), 
+      which(is.na(R)),
+      envir = globalenv()
+    )
+    
+    assign(
+      paste(R_name, "N", "miss", sep = "_"), 
+      sum(is.na(R)),
+      envir = globalenv()
+    )
     
   }
   

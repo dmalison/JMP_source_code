@@ -8,7 +8,8 @@ load('~/bin/JMP/work/fit')
 # library("shinystan")
 # launch_shinystan(fit_stan)
 
-traceplot(fit_stan, "lp__", inc_warmup = F)
+traceplot(fit_stan, pars = "lp__", inc_warmup = T)
+summary(fit_stan, "lp__", use_cache = F)[[1]]
 
 k = 1
 i = parNames[k]
@@ -21,18 +22,33 @@ i = paste("alpha_2_tilde_raw[",1:(stan_data$X_num-1), ',3]', sep = "")
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = i, inc_warmup = T)
 
-theta_2 <- extract(fit_stan, pars = "theta_2")[[1]]
+i = "gamma_3_raw"
+summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
+traceplot(fit_stan, pars = i, inc_warmup = T)
 
-theta_C_2 <- theta_2[,,3]
-apply(theta_C_2[,stan_data$R_2_ind_nomiss], 1, sd)
+i = paste("alpha_3[",1:(stan_data$X_num), ',3]', sep = "")
+summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
+traceplot(fit_stan, pars = i, inc_warmup = F)
 
-theta_C_2_bar <- colMeans(theta_C_2[,stan_data$R_2_ind_nomiss])
+i = paste("alpha_p[",1:(stan_data$X_num), ',2]', sep = "")
+summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
+traceplot(fit_stan, pars = i, inc_warmup = F)
+
+i = paste("alpha_p_tilde[",1:(stan_data$X_num), ',2]', sep = "")
+summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
+traceplot(fit_stan, pars = i, inc_warmup = F)
+
+theta_3 <- extract(fit_stan, pars = "theta_3")[[1]]
+
+theta_C_3 <- theta_3[,,3]
+
+theta_C_3_bar <- colMeans(theta_C_3)
 
 X <- stan_data$X
-summary(lm(theta_C_2_bar ~ X[stan_data$R_2_ind_nomiss,]))
+summary(lm(theta_C_3_bar ~ X))
 
-theta_C_2 = theta_2[,,3]
-theta_N_2 = theta_2[,,2]
+theta_C_3= colMeans(theta_3[,,3])
+theta_N_3= theta_3[,,2]
 
 hist(apply(theta_N_2, 2, sd))
 
@@ -58,8 +74,18 @@ gamma_M_C_4[1]
 traceplot(fit_stan, pars = paste("theta_1[", sample(stan_data$N,9), ",2]", sep = ""), inc_warmup = T)
 k = k + 1
 
-theta_3 <- colMeans(extract(fit_stan, "theta_3")[[1]])
-theta_2 <- colMeans(extract(fit_stan, "theta_2")[[1]])
+epsilon_2 <- colMeans(extract(fit_stan, "epsilon_2")[[1]])
+
+epsilon_2 <- colMeans(extract(fit_stan, "epsilon_2")[[1]])
+
+
+epsilon_2[,3]
+cor(cbind(epsilon_2[,3],stan_data$X))[1,]
+
+theta_3 <- extract(fit_stan, "theta_3")[[1]]
+theta_2 <- extract(fit_stan, "theta_2")[[1]]
+
+hist(theta_3[,10,3])
 
 which(theta_3[,3] == 0)
 
