@@ -206,7 +206,7 @@ fit_stan = stan(
            # "lambda",
            # "theta_0", 
            # "theta_1",
-           # "theta_2",
+           "theta_2",
            "theta_3",
            # "theta_4",
            # "xi_1_raw",
@@ -241,11 +241,11 @@ fit_stan = stan(
   # warmup = 5,
   # refresh = 1,
   chains = 8,
-  iter = 750,
-  warmup = 500,
+  iter = 1250,
+  warmup = 1000,
   refresh = 10,
   init_r = .5,
-  control = list(max_treedepth = 10, adapt_delta = .8)
+  control = list(max_treedepth = 12, adapt_delta = .8)
 )
 
 save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit")
