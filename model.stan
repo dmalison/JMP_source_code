@@ -376,6 +376,9 @@ data {
 }
 transformed data {
   
+  cholesky_factor_corr[3] L_corr_2 = diag_matrix(rep_vector(1,3));
+  cholesky_factor_corr[3] L_corr_3 = diag_matrix(rep_vector(1,3));
+
   /*** declare X_R, X_Q ***/
 
   // standardized covariate matrix (orthonormal, mean-zero columns)
@@ -530,7 +533,7 @@ parameters {
 // row_vector[5] gamma_2_raw;
   row_vector[2] delta_2_raw;
 // row_vector[2] xi_2_raw;
-  cholesky_factor_corr[3] L_corr_2;
+  // cholesky_factor_corr[3] L_corr_2;
 
   row_vector[3] epsilon_2[N]; // use array to vectorize in multinormal
 
@@ -544,7 +547,7 @@ parameters {
   row_vector[4] gamma_3_raw;
 //   row_vector[2] xi_3_raw;
   row_vector[2] delta_3_raw;
-  cholesky_factor_corr[3] L_corr_3;
+  // cholesky_factor_corr[3] L_corr_3;
 
   row_vector[3] epsilon_3[N];
 
@@ -927,10 +930,10 @@ transformed parameters {
     gamma_3_[1,1] = gamma_1_1_raw;
     gamma_3_[2,2] = gamma_2_2_raw;
     gamma_3_[3,3] = gamma_3_3_raw;
-    // gamma_3_[1,2] = gamma_3_raw[1];
-    // gamma_3_[3,2] = gamma_3_raw[2];
-    // gamma_3_[1,3] = gamma_3_raw[3];
-    // gamma_3_[2,3] = gamma_3_raw[4];
+    gamma_3_[1,2] = gamma_3_raw[1];
+    gamma_3_[3,2] = gamma_3_raw[2];
+    gamma_3_[1,3] = gamma_3_raw[3];
+    gamma_3_[2,3] = gamma_3_raw[4];
 
     // xi_3_[1,1]   = gamma_3_raw[1];
     // xi_3_[1,2:3] = xi_3_raw;
@@ -1122,7 +1125,7 @@ model {
   //  gamma_2_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_2_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   //  xi_2_raw    ~ normal(normal_mu_prior, normal_sigma_prior);
-  L_corr_2    ~ lkj_corr_cholesky(lkj_eta_prior_3);
+  // L_corr_2    ~ lkj_corr_cholesky(lkj_eta_prior_3);
 
   /*** theta_3 ***/
 
@@ -1135,7 +1138,7 @@ model {
   gamma_3_3_raw ~ gamma(6.25,2.5);
   delta_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   // xi_3_raw    ~ normal(normal_mu_prior, normal_sigma_prior);
-  L_corr_3    ~ lkj_corr_cholesky(lkj_eta_prior_3);
+  // L_corr_3    ~ lkj_corr_cholesky(lkj_eta_prior_3);
 
   /*** theta_4 ***/
   // 
