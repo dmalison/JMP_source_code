@@ -927,10 +927,10 @@ transformed parameters {
     gamma_3_[1,1] = gamma_1_1_raw;
     gamma_3_[2,2] = gamma_2_2_raw;
     gamma_3_[3,3] = gamma_3_3_raw;
-    gamma_3_[1,2] = gamma_3_raw[1];
-    gamma_3_[3,2] = gamma_3_raw[2];
-    gamma_3_[1,3] = gamma_3_raw[3];
-    gamma_3_[2,3] = gamma_3_raw[4];
+    // gamma_3_[1,2] = gamma_3_raw[1];
+    // gamma_3_[3,2] = gamma_3_raw[2];
+    // gamma_3_[1,3] = gamma_3_raw[3];
+    // gamma_3_[2,3] = gamma_3_raw[4];
 
     // xi_3_[1,1]   = gamma_3_raw[1];
     // xi_3_[1,2:3] = xi_3_raw;

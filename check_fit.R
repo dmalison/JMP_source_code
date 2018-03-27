@@ -22,7 +22,7 @@ i = paste("alpha_3_tilde_raw[",1:(stan_data$X_num-1), ',3]', sep = "")
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = i, inc_warmup = F)
 
-i = "sigma_3"
+i = "corr_2"
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = i, inc_warmup = T)
 
