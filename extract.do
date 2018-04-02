@@ -571,15 +571,17 @@ egen theta_N_2 = rowmean(M_N_2_cat3*)
 gen M_C_2_1 = ppvtstd if ppvtstd > 0 
 replace M_C_2_1 = tvipstd if M_C_2_1 == . & tvipstd > 0
 
-gen M_C_2_2 = ppvtstd_m if ppvtstd_m > 0
-replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
+//gen M_C_2_2 = ppvtstd_m if ppvtstd_m > 0
+//replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
 
 replace cm3cogsc = . if cm3cogsc <= 0
 replace cf3cogsc = . if cf3cogsc <= 0
 
 * average parents cognitive scores and use predicted values to reduce noise
 
-egen M_C_2_3 = rowmean(cm3cogsc cf3cogsc)
+//egen M_C_2_3 = rowmean(cm3cogsc cf3cogsc)
+gen M_C_2_2 = cm3cogsc
+gen M_C_2_3 = cf3cogsc
 
 * standardize and average measurements
 
@@ -1252,12 +1254,6 @@ forvalues i = 0/4{
 	replace theta_R_`i' = 0 if R_`i' == 0 
 }
 
-foreach var of varlist M_R_2_* M_N_2_* M_C_2_*{
-
-	replace `var' = . if R_2 == .
-
-}
-
 foreach var of varlist M_R_3_* M_N_3_* M_C_3_*{
 
 	replace `var' = . if R_3 == .
@@ -1283,6 +1279,12 @@ forvalues i = 2/4{
 	drop theta_C_`i'
 	rename theta_C_`i'_ theta_C_`i'
 }
+
+foreach var of varlist M_C_2*{
+
+	egen temp = std(`var')
+	drop `var'
+	rename temp `var'
 
 }
 

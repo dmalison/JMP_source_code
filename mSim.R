@@ -32,13 +32,15 @@ mSim <- function(mData){
     
   }
   
-  theta <- get(paste("theta", period, sep = "_")) # latent variables
+#  theta <- get(paste("theta", period, sep = "_")) # latent variables
+  theta <- get(paste("theta", variable, period, sep = "_"))
   
   for (m in 1:num){
     
     if (variable == "C") {
       
-      M <- mu_M[m] + gamma_M[m] * theta[,variable] + rnorm(N, sd = sigma_M[m])
+      # M <- mu_M[m] + gamma_M[m] * theta[,variable] + rnorm(N, sd = sigma_M[m])
+      M <- mu_M[m] + gamma_M[m] * theta + rnorm(N, sd = sigma_M[m])
       
     } else {
       
