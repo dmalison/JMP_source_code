@@ -17,7 +17,9 @@ for(
   filename in 
   c(
     "~/bin/JMP/work/fit_M_R_2",
-    "~/bin/JMP/work/fit_M_N_2"
+    "~/bin/JMP/work/fit_M_N_2",
+    "~/bin/JMP/work/fit_M_C_2",
+    "~/bin/JMP/work/fit_M_C_3"
   )
 )
 {
@@ -32,4 +34,7 @@ for(
   rm(fit_stan, stan_data, parNames)
   
 }
+
+save(list = "measurementPars", file = "~/bin/JMP/work/measurement_parameters")
+
 

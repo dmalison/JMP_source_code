@@ -2,8 +2,9 @@
 
 rm(list = ls())
 library("rstan")
+library("foreign")
 setwd("~/bin/JMP/JMP_source_code")
-load('~/bin/JMP/work/fit_M_N_2')
+load('~/bin/JMP/work/fit_M_C_3')
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") 
 
 # library("shinystan")
