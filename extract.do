@@ -571,23 +571,21 @@ egen theta_N_2 = rowmean(M_N_2_cat3*)
 gen M_C_2_1 = ppvtstd if ppvtstd > 0 
 replace M_C_2_1 = tvipstd if M_C_2_1 == . & tvipstd > 0
 
-//gen M_C_2_2 = ppvtstd_m if ppvtstd_m > 0
-//replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
+gen M_C_2_2 = ppvtstd_m if ppvtstd_m > 0
+replace M_C_2_2 = tvipstd_m if M_C_2_2 == . & tvipstd_m > 0
 
 replace cm3cogsc = . if cm3cogsc <= 0
 replace cf3cogsc = . if cf3cogsc <= 0
 
-* average parents cognitive scores and use predicted values to reduce noise
-
-//egen M_C_2_3 = rowmean(cm3cogsc cf3cogsc)
-gen M_C_2_2 = cm3cogsc
-gen M_C_2_3 = cf3cogsc
+gen M_C_2_3 = cm3cogsc
+gen M_C_2_4 = cf3cogsc
 
 * standardize and average measurements
 
 egen M_C_2_1_ = std(M_C_2_1)
 egen M_C_2_2_ = std(M_C_2_2)
 egen M_C_2_3_ = std(M_C_2_3)
+egen M_C_2_4_ = std(M_C_2_4)
 
 egen theta_C_2 = rowmean(M_C_2_?_)
 
@@ -1279,15 +1277,6 @@ forvalues i = 2/4{
 	drop theta_C_`i'
 	rename theta_C_`i'_ theta_C_`i'
 }
-
-foreach var of varlist M_C_2*{
-
-	egen temp = std(`var')
-	drop `var'
-	rename temp `var'
-
 }
-
-
 saveold "~/data/Fragile_Families/extract/extract_noretro.dta", version(12) replace
 

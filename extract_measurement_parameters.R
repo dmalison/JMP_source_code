@@ -1,0 +1,35 @@
+# Header ----------------------------------------------------------------
+
+setwd("~/bin/JMP/JMP_source_code")
+
+rm(list = ls())
+
+library("rstan")       # used to sample from posterior using MCMC
+
+# RStan recommends calling the following lines before use
+
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+
+measurementPars = list()
+
+for(
+  filename in 
+  c(
+    "~/bin/JMP/work/fit_M_R_2",
+    "~/bin/JMP/work/fit_M_N_2"
+  )
+)
+{
+  load(filename)
+  
+  for (i in parNames){
+    x <- extract(fit_stan, pars = i)[[1]]
+    measurementPars[[i]] = colMeans(x)
+    rm(i,x)
+  }
+  
+  rm(fit_stan, stan_data, parNames)
+  
+}
+

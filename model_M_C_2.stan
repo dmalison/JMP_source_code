@@ -53,13 +53,13 @@ transformed data {
   
   // convert gamma mean and sd to alpha and beta parameters
 
-  vector[C_2_num] mu_M_C_2_sigma = rep_vector(1, C_2_num); //mu_M_C_2_mean/5;
+  vector[C_2_num] mu_M_C_2_sigma = mu_M_C_2_mean/5;
 
-  vector<lower = 0>[C_2_num] gamma_M_C_2_alpha = rep_vector(1, C_2_num); //square(gamma_M_C_2_mean) ./ square(gamma_M_C_2_mean/5);
-  vector<lower = 0>[C_2_num] gamma_M_C_2_beta  = rep_vector(1, C_2_num); //gamma_M_C_2_mean ./ square(gamma_M_C_2_mean/5);
+  vector<lower = 0>[C_2_num] gamma_M_C_2_alpha = square(gamma_M_C_2_mean) ./ square(gamma_M_C_2_mean/2);
+  vector<lower = 0>[C_2_num] gamma_M_C_2_beta  = gamma_M_C_2_mean ./ square(gamma_M_C_2_mean/2);
   
-  vector<lower = 0>[C_2_num] sigma_M_C_2_alpha = rep_vector(1, C_2_num); //square(sigma_M_C_2_mean) ./ square(sigma_M_C_2_mean/5);
-  vector<lower = 0>[C_2_num] sigma_M_C_2_beta  = rep_vector(1, C_2_num); //sigma_M_C_2_mean ./ square(sigma_M_C_2_mean/5);
+  vector<lower = 0>[C_2_num] sigma_M_C_2_alpha = square(sigma_M_C_2_mean) ./ square(sigma_M_C_2_mean/2);
+  vector<lower = 0>[C_2_num] sigma_M_C_2_beta  = sigma_M_C_2_mean ./ square(sigma_M_C_2_mean/2);
   
 }
 parameters {
@@ -75,7 +75,7 @@ transformed parameters {
 }
 model {
 
-mu_M_C_2    ~ normal(mu_M_C_2_mean, 1); //mu_M_C_2_sigma);
+mu_M_C_2    ~ normal(mu_M_C_2_mean, mu_M_C_2_sigma);
 gamma_M_C_2 ~ gamma(gamma_M_C_2_alpha, gamma_M_C_2_beta);
 sigma_M_C_2 ~ gamma(sigma_M_C_2_alpha, sigma_M_C_2_beta);
 

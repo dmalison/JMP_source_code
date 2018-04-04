@@ -1,0 +1,80 @@
+# Header ----------------------------------------------------------------
+
+setwd("~/bin/JMP/JMP_source_code")
+
+rm(list = ls())
+
+library("rstan")       # used to sample from posterior using MCMC
+library("foreign")     # used to import data from Stata
+
+# RStan recommends calling the following lines before use
+
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+
+# Load data ---------------------------------------------------------------
+
+data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
+N <- nrow(data_raw) # number of observations
+
+# Extract measurements ---------------------------------------------------
+
+mFrame <- # contains variable, period, and number of categories
+  data.frame(
+    variable = "C",
+    period = 2,
+    n_cat = NA,
+    stringsAsFactors = F
+  )
+
+source("mExtract.R")
+
+for (i in 1:nrow(mFrame)) mExtract(mFrame[i,])
+
+# Construct prior parameters --------------------------------------------------------
+
+source("mPrior.R")
+
+for (i in (1:nrow(mFrame))) mPrior(mFrame[i,])
+
+rm(mFrame)
+
+# Make lists --------------------------------------------------------------
+
+# parNames: list of parameter names
+parNames = c("mu_M_C_2", "gamma_M_C_2", "sigma_M_C_2")
+
+# stan_data: list of objects used by stan program
+stan_data <- list()
+
+for (
+  i in 
+  c(
+    "N",
+    "C_2_num", "I_C_2_num", "I_C_2_ind", "M_C_2",
+    "mu_M_C_2_mean", "gamma_M_C_2_mean", "sigma_M_C_2_mean"
+  )
+)
+{
+  stan_data[[i]] <- get(i)
+  rm(i)
+}
+
+rm(list = c(names(stan_data), names(parNames)))
+
+# Fit model with stan -----------------------------------------------------
+
+fit_stan = stan(
+  file = 'model_M_C_2.stan',
+  data = stan_data,
+  # chains = 1,
+  # iter = 10,
+  # warmup = 5,
+  # refresh = 1
+  chains = 8,
+  iter = 1250,
+  warmup = 1000,
+  refresh = 10
+)
+
+save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit_M_C_2")
