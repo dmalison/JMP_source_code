@@ -310,74 +310,74 @@ data {
     int<lower = 0, upper = N> R_4_ind1[R_4_N1];
     int<lower = 0, upper = N> R_4_ind_nomiss[R_4_N0 + R_4_N1];
 
-  /*** prior parameters ***/
+  /*** measurement parameters ***/
   
     /*** theta_0 ***/
     
-    vector<lower = 0>[R_0_cat3_num] gamma_M_R_0_cat3_mean;
-    ordered[2] c_M_R_0_cat3_mean[R_0_cat3_num];
+    // vector<lower = 0>[R_0_cat3_num] gamma_M_R_0_cat3_mean;
+    // ordered[2] c_M_R_0_cat3_mean[R_0_cat3_num];
   
     /*** theta_1 ***/
   
-    vector<lower = 0>[R_1_cat3_num] gamma_M_R_1_cat3_mean;
-    ordered[2] c_M_R_1_cat3_mean[R_1_cat3_num];
-
-    vector<lower = 0>[R_1_cat5_num] gamma_M_R_1_cat5_mean;
-    ordered[4] c_M_R_1_cat5_mean[R_1_cat5_num];
-
-    vector<lower = 0>[N_1_cat5_num] gamma_M_N_1_cat5_mean;
-    ordered[4] c_M_N_1_cat5_mean[N_1_cat5_num];
+    // vector<lower = 0>[R_1_cat3_num] gamma_M_R_1_cat3_mean;
+    // ordered[2] c_M_R_1_cat3_mean[R_1_cat3_num];
+    // 
+    // vector<lower = 0>[R_1_cat5_num] gamma_M_R_1_cat5_mean;
+    // ordered[4] c_M_R_1_cat5_mean[R_1_cat5_num];
+    // 
+    // vector<lower = 0>[N_1_cat5_num] gamma_M_N_1_cat5_mean;
+    // ordered[4] c_M_N_1_cat5_mean[N_1_cat5_num];
     
     /*** theta_2 ***/
    
-    vector<lower = 0>[R_2_cat3_num] gamma_M_R_2_cat3_mean;
-    ordered[2] c_M_R_2_cat3_mean[R_2_cat3_num];
+    vector<lower = 0>[R_2_cat3_num] gamma_M_R_2_cat3;
+    ordered[2] c_M_R_2_cat3[R_2_cat3_num];
 
-    vector<lower = 0>[R_2_cat5_num] gamma_M_R_2_cat5_mean;
-    ordered[4] c_M_R_2_cat5_mean[R_2_cat5_num];
+    vector<lower = 0>[R_2_cat5_num] gamma_M_R_2_cat5;
+    ordered[4] c_M_R_2_cat5[R_2_cat5_num];
 
-    vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3_mean;
-    ordered[2] c_M_N_2_cat3_mean[N_2_cat3_num];
+    vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3;
+    ordered[2] c_M_N_2_cat3[N_2_cat3_num];
 
-    vector[C_2_num] mu_M_C_2_mean;
-    vector<lower = 0>[C_2_num] gamma_M_C_2_mean;
-    vector<lower = 0>[C_2_num] sigma_M_C_2_mean;
+    vector[C_2_num] mu_M_C_2;
+    vector<lower = 0>[C_2_num] gamma_M_C_2;
+    vector<lower = 0>[C_2_num] sigma_M_C_2;
 
     /*** theta_3 ***/
 
-    vector<lower = 0>[R_3_cat3_num] gamma_M_R_3_cat3_mean;
-    ordered[2] c_M_R_3_cat3_mean[R_3_cat3_num];
+    // vector<lower = 0>[R_3_cat3_num] gamma_M_R_3_cat3_mean;
+    // ordered[2] c_M_R_3_cat3_mean[R_3_cat3_num];
+    // 
+    // vector<lower = 0>[R_3_cat5_num] gamma_M_R_3_cat5_mean;
+    // ordered[4] c_M_R_3_cat5_mean[R_3_cat5_num];
+    // 
+    // vector<lower = 0>[N_3_cat3_num] gamma_M_N_3_cat3_mean;
+    // ordered[2] c_M_N_3_cat3_mean[N_3_cat3_num];
 
-    vector<lower = 0>[R_3_cat5_num] gamma_M_R_3_cat5_mean;
-    ordered[4] c_M_R_3_cat5_mean[R_3_cat5_num];
-
-    vector<lower = 0>[N_3_cat3_num] gamma_M_N_3_cat3_mean;
-    ordered[2] c_M_N_3_cat3_mean[N_3_cat3_num];
-
-    vector[C_3_num] mu_M_C_3_mean;
-    vector<lower = 0>[C_3_num] gamma_M_C_3_mean; 
-    vector<lower = 0>[C_3_num] sigma_M_C_3_mean;
+    vector[C_3_num] mu_M_C_3;
+    vector<lower = 0>[C_3_num] gamma_M_C_3;
+    vector<lower = 0>[C_3_num] sigma_M_C_3;
 
     /*** theta_4 ***/
     
-    vector<lower = 0>[R_4_cat3_num] gamma_M_R_4_cat3_mean;
-    ordered[2] c_M_R_4_cat3_mean[R_4_cat3_num];
-
-    vector<lower = 0>[R_4_cat5_num] gamma_M_R_4_cat5_mean;
-    ordered[4] c_M_R_4_cat5_mean[R_4_cat5_num];
-
-    vector<lower = 0>[N_4_cat3_num] gamma_M_N_4_cat3_mean;
-    ordered[2] c_M_N_4_cat3_mean[N_4_cat3_num];
-
-    vector[C_4_num] mu_M_C_4_mean;
-    vector<lower = 0>[C_4_num] gamma_M_C_4_mean;
-    vector<lower = 0>[C_4_num] sigma_M_C_4_mean;
+    // vector<lower = 0>[R_4_cat3_num] gamma_M_R_4_cat3_mean;
+    // ordered[2] c_M_R_4_cat3_mean[R_4_cat3_num];
+    // 
+    // vector<lower = 0>[R_4_cat5_num] gamma_M_R_4_cat5_mean;
+    // ordered[4] c_M_R_4_cat5_mean[R_4_cat5_num];
+    // 
+    // vector<lower = 0>[N_4_cat3_num] gamma_M_N_4_cat3_mean;
+    // ordered[2] c_M_N_4_cat3_mean[N_4_cat3_num];
+    // 
+    // vector[C_4_num] mu_M_C_4_mean;
+    // vector<lower = 0>[C_4_num] gamma_M_C_4_mean;
+    // vector<lower = 0>[C_4_num] sigma_M_C_4_mean;
 
 }
 transformed data {
 
-  cholesky_factor_corr[3] L_corr_2 = diag_matrix(rep_vector(1,3));
-  cholesky_factor_corr[3] L_corr_3 = diag_matrix(rep_vector(1,3));
+  // cholesky_factor_corr[3] L_corr_2 = diag_matrix(rep_vector(1,3));
+  // cholesky_factor_corr[3] L_corr_3 = diag_matrix(rep_vector(1,3));
   
   /*** declare X_R, X_Q ***/
 
@@ -385,8 +385,7 @@ transformed data {
 
   matrix[X_num, X_num] X_R;
   matrix[N, X_num] X_Q; 
-  // X_Q without constant term
-  matrix[N, X_num - 1] X_Q_nocons; 
+  matrix[N, X_num - 1] X_Q_nocons;
 
   /*** declare relationship indicator vectors for full sample ***/
 
@@ -416,75 +415,6 @@ transformed data {
   real lkj_eta_prior_3 = .5/square(lkj_sd_prior)*(1 - 2*square(lkj_sd_prior)); 
   real lkj_eta_prior_4 = .5/square(lkj_sd_prior)*(1 - 3*square(lkj_sd_prior));   
   
-  // convert gamma mean and sd to alpha and beta parameters
-  
-    /*** theta_0 ***/
-  
-    vector<lower = 0>[R_0_cat3_num] gamma_M_R_0_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_0_cat3_mean);
-    vector<lower = 0>[R_0_cat3_num] gamma_M_R_0_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_0_cat3_mean;
-
-    /*** theta_1 ***/
-
-    vector<lower = 0>[R_1_cat3_num] gamma_M_R_1_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_1_cat3_mean);
-    vector<lower = 0>[R_1_cat3_num] gamma_M_R_1_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_1_cat3_mean;
-
-    vector<lower = 0>[R_1_cat5_num] gamma_M_R_1_cat5_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_1_cat5_mean);
-    vector<lower = 0>[R_1_cat5_num] gamma_M_R_1_cat5_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_1_cat5_mean;
-
-    vector<lower = 0>[N_1_cat5_num] gamma_M_N_1_cat5_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_N_1_cat5_mean);
-    vector<lower = 0>[N_1_cat5_num] gamma_M_N_1_cat5_beta  = pow(gamma_sd_prior, -2)*gamma_M_N_1_cat5_mean;
-   
-    /*** theta_2 ***/
-   
-    vector<lower = 0>[R_2_cat3_num] gamma_M_R_2_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_2_cat3_mean);
-    vector<lower = 0>[R_2_cat3_num] gamma_M_R_2_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_2_cat3_mean;
-
-    vector<lower = 0>[R_2_cat5_num] gamma_M_R_2_cat5_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_2_cat5_mean);
-    vector<lower = 0>[R_2_cat5_num] gamma_M_R_2_cat5_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_2_cat5_mean;
-
-    vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_N_2_cat3_mean);
-    vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_N_2_cat3_mean;
-
-    vector<lower = 0>[C_2_num] gamma_M_C_2_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_C_2_mean);
-    vector<lower = 0>[C_2_num] gamma_M_C_2_beta  = pow(gamma_sd_prior, -2)*gamma_M_C_2_mean;
-
-    vector<lower = 0>[C_2_num] sigma_M_C_2_alpha = pow(gamma_sd_prior, -2)*square(sigma_M_C_2_mean);
-    vector<lower = 0>[C_2_num] sigma_M_C_2_beta  = pow(gamma_sd_prior, -2)*sigma_M_C_2_mean;
-   
-    /*** theta_3 ***/
-   
-    vector<lower = 0>[R_3_cat3_num] gamma_M_R_3_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_3_cat3_mean);
-    vector<lower = 0>[R_3_cat3_num] gamma_M_R_3_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_3_cat3_mean;
-
-    vector<lower = 0>[R_3_cat5_num] gamma_M_R_3_cat5_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_3_cat5_mean);
-    vector<lower = 0>[R_3_cat5_num] gamma_M_R_3_cat5_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_3_cat5_mean;
-
-    vector<lower = 0>[N_3_cat3_num] gamma_M_N_3_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_N_3_cat3_mean);
-    vector<lower = 0>[N_3_cat3_num] gamma_M_N_3_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_N_3_cat3_mean;
-
-    vector<lower = 0>[C_3_num] gamma_M_C_3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_C_3_mean);
-    vector<lower = 0>[C_3_num] gamma_M_C_3_beta  = pow(gamma_sd_prior, -2)*gamma_M_C_3_mean;
-
-    vector<lower = 0>[C_3_num] sigma_M_C_3_alpha = pow(gamma_sd_prior, -2)*square(sigma_M_C_3_mean);
-    vector<lower = 0>[C_3_num] sigma_M_C_3_beta  = pow(gamma_sd_prior, -2)*sigma_M_C_3_mean;
-    
-    /*** theta_4 ***/
-  
-    vector<lower = 0>[R_4_cat3_num] gamma_M_R_4_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_4_cat3_mean);
-    vector<lower = 0>[R_4_cat3_num] gamma_M_R_4_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_4_cat3_mean;
-
-    vector<lower = 0>[R_4_cat5_num] gamma_M_R_4_cat5_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_R_4_cat5_mean);
-    vector<lower = 0>[R_4_cat5_num] gamma_M_R_4_cat5_beta  = pow(gamma_sd_prior, -2)*gamma_M_R_4_cat5_mean;
-
-    vector<lower = 0>[N_4_cat3_num] gamma_M_N_4_cat3_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_N_4_cat3_mean);
-    vector<lower = 0>[N_4_cat3_num] gamma_M_N_4_cat3_beta  = pow(gamma_sd_prior, -2)*gamma_M_N_4_cat3_mean;
-
-    vector<lower = 0>[C_4_num] gamma_M_C_4_alpha = pow(gamma_sd_prior, -2)*square(gamma_M_C_4_mean);
-    vector<lower = 0>[C_4_num] gamma_M_C_4_beta  = pow(gamma_sd_prior, -2)*gamma_M_C_4_mean;
-
-    vector<lower = 0>[C_4_num] sigma_M_C_4_alpha = pow(gamma_sd_prior, -2)*square(sigma_M_C_4_mean);
-    vector<lower = 0>[C_4_num] sigma_M_C_4_beta  = pow(gamma_sd_prior, -2)*sigma_M_C_4_mean;
-
   /*** assign X_R and X_Q ***/
     
     X_R = qr_R(X)[1:X_num,] / sqrt(N - 1);
@@ -533,23 +463,21 @@ parameters {
   // row_vector[5] gamma_2_raw;
   row_vector[2] delta_2_raw;
   // row_vector[2] xi_2_raw;
-  //  cholesky_factor_corr[3] L_corr_2;
+   cholesky_factor_corr[3] L_corr_2;
 
   row_vector[3] epsilon_2[N]; // use array to vectorize in multinormal
 
 /*** theta_3 ***/
 
-  vector[X_num + 5] coef_C_3_raw;
-  // matrix[X_num-1,3] alpha_3_tilde_raw;
-  // row_vector[2] beta_3_raw;
-  // real<lower = 0> gamma_3_11_raw;
-  // real<lower = 0> gamma_3_22_raw;
-  // real<lower = 0> gamma_3_33_raw;
-  // row_vector[4] gamma_3_raw;
-  // row_vector[2] xi_3_raw;
-  // row_vector[2] delta_3_raw;
-  // cholesky_factor_corr[3] L_corr_3;
-  // cholesky_factor_corr[2] L_corr_3_raw;
+  matrix[X_num-1,3] alpha_3_tilde_raw;
+  row_vector[2] beta_3_raw;
+  real<lower = 0> gamma_3_11_raw;
+  real<lower = 0> gamma_3_22_raw;
+  real<lower = 0> gamma_3_33_raw;
+  row_vector[4] gamma_3_raw;
+  row_vector[2] xi_3_raw;
+  row_vector[2] delta_3_raw;
+  cholesky_factor_corr[3] L_corr_3;
 
   row_vector[3] epsilon_3[N];
 
@@ -564,81 +492,6 @@ parameters {
   // 
   // matrix[R_4_N1, 3] epsilon_4;
   // matrix[R_4_N0, 2] epsilon_NC_4_R4eq0;
-
-/*** M_R_0 ***/
-
-  // vector<lower = 0>[R_0_cat3_num] gamma_M_R_0_cat3;
-  // ordered[2] c_M_R_0_cat3[R_0_cat3_num];
-
-/*** M_R_1 ***/
-
-  // vector<lower = 0>[R_1_cat3_num] gamma_M_R_1_cat3;
-  // ordered[2] c_M_R_1_cat3[R_1_cat3_num];
-  // 
-  // vector<lower = 0>[R_1_cat5_num] gamma_M_R_1_cat5;
-  // ordered[4] c_M_R_1_cat5[R_1_cat5_num];
-
-/*** M_N_1 ***/
-
-  // vector<lower = 0>[N_1_cat5_num] gamma_M_N_1_cat5;
-  // ordered[4] c_M_N_1_cat5[N_1_cat5_num];
-
-/*** M_R_2 ***/
-
-  vector<lower = 0>[R_2_cat3_num] gamma_M_R_2_cat3;
-  ordered[2] c_M_R_2_cat3[R_2_cat3_num];
-
-  vector<lower = 0>[R_2_cat5_num] gamma_M_R_2_cat5;
-  ordered[4] c_M_R_2_cat5[R_2_cat5_num];
-
-/*** M_N_2 ***/
-
-  vector<lower = 0>[N_2_cat3_num] gamma_M_N_2_cat3;
-  ordered[2] c_M_N_2_cat3[N_2_cat3_num];
-
-/*** M_C_2 ***/
-
-  vector[C_2_num] mu_M_C_2;
-  vector<lower = 0>[C_2_num] gamma_M_C_2;
-  vector<lower = 0>[C_2_num] sigma_M_C_2;
-
-/*** M_R_3 ***/
-
-  vector<lower = 0>[R_3_cat3_num] gamma_M_R_3_cat3;
-  ordered[2] c_M_R_3_cat3[R_3_cat3_num];
-
-  vector<lower = 0>[R_3_cat5_num] gamma_M_R_3_cat5;
-  ordered[4] c_M_R_3_cat5[R_3_cat5_num];
-
-/*** M_N_3 ***/
-
-  vector<lower = 0>[N_3_cat3_num] gamma_M_N_3_cat3;
-  ordered[2] c_M_N_3_cat3[N_3_cat3_num];
-
-/*** M_C_3 ***/
-
-  vector[C_3_num] mu_M_C_3;
-  vector<lower = 0>[C_3_num] gamma_M_C_3;
-  vector<lower = 0>[C_3_num] sigma_M_C_3;
-
-/*** M_R_4 ***/
-
-  // vector<lower = 0>[R_4_cat3_num] gamma_M_R_4_cat3;
-  // ordered[2] c_M_R_4_cat3[R_4_cat3_num];
-  // 
-  // vector<lower = 0>[R_4_cat5_num] gamma_M_R_4_cat5;
-  // ordered[4] c_M_R_4_cat5[R_4_cat5_num];
-
-/*** M_N_4 ***/
-
-  // vector<lower = 0>[N_4_cat3_num] gamma_M_N_4_cat3;
-  // ordered[2] c_M_N_4_cat3[N_4_cat3_num];
-
-/*** M_C_4 ***/
-
-  // vector[C_4_num] mu_M_C_4;
-  // vector<lower = 0>[C_4_num] gamma_M_C_4;
-  // vector<lower = 0>[C_4_num] sigma_M_C_4;
 
 /*** relationship indicators ***/
 
@@ -688,15 +541,13 @@ transformed parameters {
 
   /*** theta_3 ***/
 
-  matrix[X_num+6, 3] coef_3;
-  // matrix[X_num,3] alpha_3_tilde = rep_matrix(0, X_num, 3);
-  // row_vector[3] beta_3 = rep_row_vector(0,3);
-  // matrix[3,3] gamma_3  = rep_matrix(0,3,3);
-  // row_vector[3] delta_3 = rep_row_vector(0,3);
-  // matrix[3,3] xi_3;
-  row_vector[3] sigma_3 = rep_row_vector(1,3);
+  matrix[X_num,3] alpha_3_tilde = rep_matrix(0, X_num, 3);
+  row_vector[3]   beta_3        = rep_row_vector(0,3);
+  matrix[3,3]     gamma_3       = rep_matrix(0,3,3);
+  row_vector[3]   delta_3       = rep_row_vector(0,3);
+  matrix[3,3]     xi_3          = rep_matrix(0,3,3);
+  row_vector[3]   sigma_3       = rep_row_vector(1,3);
   // // vector[3] c_3;
-  // cholesky_factor_corr[3] L_corr_3 = diag_matrix(rep_vector(1,3));
 
   /*** theta_4 ***/
 
@@ -730,6 +581,18 @@ transformed parameters {
 }
 
 //  L_corr_3[1:2, 1:2] = L_corr_3_raw;
+
+{
+    matrix[N,3] epsilon_2_ = rep_matrix(0,N,3);
+    matrix[N,3] epsilon_3_ = rep_matrix(0,N,3);
+
+    for (i in 1:N){
+      epsilon_2_[i] = epsilon_2[i];
+    }
+    
+    for (i in 1:N){
+      epsilon_3_[i] = epsilon_3[i];
+    }
 
   /*** assign theta_0 ***/
   // {
@@ -827,12 +690,6 @@ transformed parameters {
     row_vector[3] theta_2_mean = rep_row_vector(0,3);
     row_vector[3] theta_2_sd = rep_row_vector(1,3);
     
-    matrix[N,3] epsilon_2_ = rep_matrix(0,N,3);
-
-    for (i in 1:N){
-      epsilon_2_[i] = epsilon_2[i];
-    }
-
     /* place gamma and xi into matricies for easier manipulation */
 
     // matrix[2,3] gamma_2_ = rep_matrix(0.,2,3);
@@ -880,7 +737,7 @@ transformed parameters {
 
     theta_C_2 =
       X_Q_nocons * alpha_2_tilde_raw[,3] +
-      beta_2_raw[2]  * R_1  +
+      beta_2_raw[2]  * R_1 +
       delta_2_raw[2] * R_2 +
       epsilon_2_[,3];
 
@@ -922,40 +779,24 @@ transformed parameters {
     row_vector[3] theta_3_mean = rep_row_vector(0,3);
     row_vector[3] theta_3_sd = rep_row_vector(1,3);
 
-    matrix[N,3] epsilon_3_ = rep_matrix(0,N,3);
-    matrix[X_num+5,3] coef_3_ = rep_matrix(0,X_num+5,3);      // not normalized or
-    matrix[X_num+6,3] coef_3_tilde = rep_matrix(0,X_num+6,3); // normalized, not rotated
-    
-    matrix[N, X_num + 6] X_3;
-    matrix[X_num + 6, X_num + 6] X_3_R;
-    matrix[N, X_num + 6] X_3_Q; 
-    matrix[N, X_num + 5] X_3_Q_nocons; 
-
-    coef_3_[,3] = coef_C_3_raw;
-    
-    for (i in 1:N){
-      epsilon_3_[i] = epsilon_3[i];
-    }
-
     /* place gamma and xi into matricies for easier manipulation */
-    {
-    // matrix[3,3] gamma_3_ = rep_matrix(0.,3,3);
-    // matrix[3,3] xi_3_ = rep_matrix(0.,3,3);
     
-    // matrix[N,3] epsilon_2_n = epsilon_2_ * diag_matrix(sigma_2');
-    // 
-    // gamma_3_[1,1] = gamma_3_11_raw;
-    // gamma_3_[1,2] = gamma_3_raw[1];
-    // gamma_3_[2,2] = gamma_3_22_raw;
-    // gamma_3_[3,2] = gamma_3_raw[2];
-    // gamma_3_[1,3] = gamma_3_raw[3];
-    // gamma_3_[2,3] = gamma_3_raw[4];
-    // gamma_3_[3,3] = gamma_3_33_raw;
+    matrix[3,3] gamma_3_ = rep_matrix(0.,3,3);
+    matrix[3,3] xi_3_ = rep_matrix(0.,3,3);
 
-    // xi_3_[1,2:3] = xi_3_raw;
-    }
+    matrix[N,3] epsilon_2_n = epsilon_2_ * diag_matrix(sigma_2');
+
+    gamma_3_[1,1] = gamma_3_11_raw;
+    gamma_3_[1,2] = gamma_3_raw[1];
+    gamma_3_[2,2] = gamma_3_22_raw;
+    gamma_3_[3,2] = gamma_3_raw[2];
+    gamma_3_[1,3] = gamma_3_raw[3];
+    gamma_3_[2,3] = gamma_3_raw[4];
+    gamma_3_[3,3] = gamma_3_33_raw;
+
+    xi_3_[1,2:3] = xi_3_raw;
+    
     /* generate unnormalized latent variables */
-    {
     //
     //   theta_R_3 =
     //     X_Q_nocons[R_3_ind1,] * alpha_3_tilde_raw[,1] +
@@ -977,7 +818,7 @@ transformed parameters {
     // //    lambda[R_3_ind0,2:3] * c_NC_diag +
     //     epsilon_NC_3_R3eq0*L_corr_3_R3eq0';
 
-    // theta_R_3 = 
+    // theta_R_3 =
     //   X_Q_nocons * alpha_3_tilde_raw[,1] +
     //   // lambda[,1] * c[1] +
     //   epsilon_2_n * gamma_3_[,1] +
@@ -990,35 +831,15 @@ transformed parameters {
     //   epsilon_2_n * gamma_3_[,2] +
     //   (epsilon_2_n  * xi_3_[,2]) .* R_3 +
     //   epsilon_3_[,2];
-    // 
-    // theta_C_3 =
-    //   X_Q_nocons * alpha_3_tilde_raw[,3] +
-    //   beta_3_raw[2] * R_2 +
-    //   delta_3_raw[2] * R_3 +
-    //   epsilon_2_n * gamma_3_[,3] +
-    //   (epsilon_2_n  * xi_3_[,3]) .* R_3 +
-    //   epsilon_3_[,3];
-    }
 
-    X_3[,1:X_num] = X;
-    X_3[,(X_num+1):(X_num + 3)] = theta_2;
-    X_3[,X_num + 4] = R_2;
-    X_3[,X_num + 5] = R_3;
-    X_3[,X_num + 6] = theta_3[,1] .* R_3;
-
-    X_3_R = qr_R(X_3)[1:(X_num+6),] / sqrt(N - 1);
-    X_3_Q = qr_Q(X_3)[,1:(X_num+6)] * sqrt(N - 1); 
-    X_3_Q_nocons = X_3_Q[,2:(X_num+6)];
-
-    // theta_R_3 = 
-    //   X_3_Q_nocons * coef_3_[,1] + epsilon_3_[,1];
-      
-    // theta_N_3 = 
-    //   X_3_Q_nocons * coef_3_[,2] + epsilon_3_[,2];
-      
-    theta_C_3 = 
-      X_3_Q_nocons * coef_3_[,3] + epsilon_3_[,3];
-
+    theta_C_3 =
+      X_Q_nocons * alpha_3_tilde_raw[,3] +
+      beta_3_raw[2] * R_2 +
+      delta_3_raw[2] * R_3 +
+      epsilon_2_n * gamma_3_[,3] +
+      (epsilon_2_n  * xi_3_[,3]) .* R_3 +
+      epsilon_3_[,3];
+    
     /* normalize latent variables */
 
     // theta_3_mean[1] = mean(theta_R_3);
@@ -1035,21 +856,16 @@ transformed parameters {
 
     /* normalize parameters */
 
-    coef_3_tilde[1,] = theta_3_mean ./ theta_3_sd;
-    coef_3_tilde[2:(X_num + 6),] = coef_3_ ./ (rep_vector(1,X_num+5) * theta_3_sd);
-    coef_3 = X_3_R \ coef_3_tilde;
-    
-    // alpha_3_tilde[1,] = -theta_3_mean ./ theta_3_sd;
-    // alpha_3_tilde[2:X_num,] = alpha_3_tilde_raw ./ (rep_vector(1,X_num - 1) * theta_3_sd);
-    // beta_3[1] = 0;
-    // beta_3[2:3] = beta_3_raw ./ theta_3_sd[2:3];
-    // gamma_3 = gamma_3_ ./ (rep_vector(1,3) * theta_3_sd);
-    // delta_3[1] = 0;
-    // delta_3[2:3] = delta_3_raw ./ theta_3_sd[2:3];
-    // xi_3    = xi_3_ ./ (rep_vector(1,3) * theta_3_sd);
-    // sigma_3 = rep_row_vector(1,3) ./ theta_3_sd;
-    //  c_3 = c[1:3] ./ theta_3_sd';
-    
+    alpha_3_tilde[1,] = -theta_3_mean ./ theta_3_sd;
+    alpha_3_tilde[2:X_num,] = alpha_3_tilde_raw ./ (rep_vector(1,X_num - 1) * theta_3_sd);
+    beta_3[1] = 0;
+    beta_3[2:3] = beta_3_raw ./ theta_3_sd[2:3];
+    gamma_3 = gamma_3_ ./ (rep_vector(1,3) * theta_3_sd);
+    delta_3[1] = 0;
+    delta_3[2:3] = delta_3_raw ./ theta_3_sd[2:3];
+    xi_3    = xi_3_ ./ (rep_vector(1,3) * theta_3_sd);
+    sigma_3 = rep_row_vector(1,3) ./ theta_3_sd;
+    // c_3 = c[1:3] ./ theta_3_sd';
   }
   /*** assign theta_4 ***/
   // {
@@ -1127,7 +943,7 @@ transformed parameters {
   // 
   // //  c_4 = c[1:3] ./ theta_4_sd';
   // }
-
+}
 }
 model {
 
@@ -1169,26 +985,24 @@ model {
   //  gamma_2_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_2_raw ~ normal(normal_mu_prior, normal_sigma_prior);
   //  xi_2_raw    ~ normal(normal_mu_prior, normal_sigma_prior);
-  //L_corr_2    ~ lkj_corr_cholesky(lkj_eta_prior_3);
+  L_corr_2    ~ lkj_corr_cholesky(lkj_eta_prior_3);
 
   /*** theta_3 ***/
 
-  coef_C_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
-  
-  // alpha_3_tilde_raw[,1]
-  //             ~ normal(normal_mu_prior, normal_sigma_prior);
-  // alpha_3_tilde_raw[,2]
-  //             ~ normal(normal_mu_prior, normal_sigma_prior);
-  // alpha_3_tilde_raw[,3]
-  //             ~ normal(normal_mu_prior, 2);
-  // beta_3_raw  ~ normal(normal_mu_prior, normal_sigma_prior);
-  // gamma_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
-  // gamma_3_11_raw ~ gamma(2,2);
-  // gamma_3_22_raw ~ gamma(2,2);
-  // gamma_3_33_raw ~ gamma(2,1);
-  // delta_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
-  // xi_3_raw    ~ normal(normal_mu_prior, normal_sigma_prior);
-  // L_corr_3_raw    ~ lkj_corr_cholesky(lkj_eta_prior_2);
+  alpha_3_tilde_raw[,1]
+              ~ normal(normal_mu_prior, normal_sigma_prior);
+  alpha_3_tilde_raw[,2]
+              ~ normal(normal_mu_prior, normal_sigma_prior);
+  alpha_3_tilde_raw[,3]
+              ~ normal(normal_mu_prior, normal_sigma_prior);
+  beta_3_raw  ~ normal(normal_mu_prior, normal_sigma_prior);
+  gamma_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
+  gamma_3_11_raw ~ gamma(2,2);
+  gamma_3_22_raw ~ gamma(2,2);
+  gamma_3_33_raw ~ gamma(2,2);
+  delta_3_raw ~ normal(normal_mu_prior, normal_sigma_prior);
+  xi_3_raw    ~ normal(normal_mu_prior, normal_sigma_prior);
+  L_corr_3    ~ lkj_corr_cholesky(lkj_eta_prior_3);
 
   /*** theta_4 ***/
   // 
@@ -1204,120 +1018,6 @@ model {
   
   // to_vector(alpha_anchor_tilde) ~ normal(normal_mu_prior, normal_sigma_prior);
   // to_vector(gamma_anchor) ~ normal(normal_mu_prior, normal_sigma_prior);
-
-  /*** M_R_0 ***/  
-  
-  //   gamma_M_R_0_cat3 ~ gamma(gamma_M_R_0_cat3_alpha, gamma_M_R_0_cat3_beta);
-  // 
-  //   for (m in 1:R_0_cat3_num){
-  //     c_M_R_0_cat3[m] ~ normal(c_M_R_0_cat3_mean[m], normal_sigma_prior);
-  //   }
-  // 
-  /*** M_R_1 ***/
-  // 
-  // gamma_M_R_1_cat3 ~ gamma(gamma_M_R_1_cat3_alpha, gamma_M_R_1_cat3_beta);
-  // 
-  // for (m in 1:R_1_cat3_num){
-  //   c_M_R_1_cat3[m] ~ normal(c_M_R_1_cat3_mean[m], normal_sigma_prior);
-  // }
-  // 
-  // gamma_M_R_1_cat5 ~ gamma(gamma_M_R_1_cat5_alpha, gamma_M_R_1_cat5_beta);
-  // 
-  // for (m in 1:R_1_cat5_num){
-  //   c_M_R_1_cat5[m] ~ normal(c_M_R_1_cat5_mean[m], normal_sigma_prior);
-  // }
-  // 
-  /*** M_N_1 ***/
-  // 
-  // gamma_M_N_1_cat5 ~ gamma(gamma_M_N_1_cat5_alpha, gamma_M_N_1_cat5_beta);
-  // 
-  // for (m in 1:N_1_cat5_num){
-  //   c_M_N_1_cat5[m] ~ normal(c_M_N_1_cat5_mean[m], normal_sigma_prior);
-  // }
-  // 
-  /*** M_R_2 ***/
-
-  gamma_M_R_2_cat3 ~ gamma(gamma_M_R_2_cat3_alpha, gamma_M_R_2_cat3_beta);
-
-  for (m in 1:R_2_cat3_num){
-    c_M_R_2_cat3[m] ~ normal(c_M_R_2_cat3_mean[m], normal_sigma_prior);
-  }
-
-  gamma_M_R_2_cat5 ~ gamma(gamma_M_R_2_cat5_alpha, gamma_M_R_2_cat5_beta);
-
-  for (m in 1:R_2_cat5_num){
-    c_M_R_2_cat5[m] ~ normal(c_M_R_2_cat5_mean[m], normal_sigma_prior);
-  }
-
-  /*** M_N_2 ***/
-
-  gamma_M_N_2_cat3 ~ gamma(gamma_M_N_2_cat3_alpha, gamma_M_N_2_cat3_beta);
-
-  for (m in 1:N_2_cat3_num){
-    c_M_N_2_cat3[m] ~ normal(c_M_N_2_cat3_mean[m], normal_sigma_prior);
-  }
-
-  /*** M_C_2 ***/
-
-  mu_M_C_2 ~ normal(mu_M_C_2_mean, normal_sigma_prior);
-  gamma_M_C_2 ~ gamma(gamma_M_C_2_alpha, gamma_M_C_2_beta);
-  sigma_M_C_2 ~ gamma(sigma_M_C_2_alpha, sigma_M_C_2_beta);
-
-  /*** M_R_3 ***/
-
-  gamma_M_R_3_cat3 ~ gamma(gamma_M_R_3_cat3_alpha, gamma_M_R_3_cat3_beta);
-
-  for (m in 1:R_3_cat3_num){
-    c_M_R_3_cat3[m] ~ normal(c_M_R_3_cat3_mean[m], normal_sigma_prior);
-  }
-
-  gamma_M_R_3_cat5 ~ gamma(gamma_M_R_3_cat5_alpha, gamma_M_R_3_cat5_beta);
-
-  for (m in 1:R_3_cat5_num){
-    c_M_R_3_cat5[m] ~ normal(c_M_R_3_cat5_mean[m], normal_sigma_prior);
-  }
-
-  /*** M_N_3 ***/
-
-  gamma_M_N_3_cat3 ~ gamma(gamma_M_N_3_cat3_alpha, gamma_M_N_3_cat3_beta);
-
-  for (m in 1:N_3_cat3_num){
-    c_M_N_3_cat3[m] ~ normal(c_M_N_3_cat3_mean[m], normal_sigma_prior);
-  }
-
-  /*** M_C_3 ***/
-
-  mu_M_C_3 ~ normal(mu_M_C_3_mean, normal_sigma_prior);
-  gamma_M_C_3 ~ gamma(gamma_M_C_3_alpha, gamma_M_C_3_beta);
-  sigma_M_C_3 ~ gamma(sigma_M_C_3_alpha, sigma_M_C_3_beta);
-
-  /*** M_R_4 ***/
-  // 
-  // gamma_M_R_4_cat3 ~ gamma(gamma_M_R_4_cat3_alpha, gamma_M_R_4_cat3_beta);
-  // 
-  // for (m in 1:R_4_cat3_num){
-  //   c_M_R_4_cat3[m] ~ normal(c_M_R_4_cat3_mean[m], normal_sigma_prior);
-  // }
-  // 
-  // gamma_M_R_4_cat5 ~ gamma(gamma_M_R_4_cat5_alpha, gamma_M_R_4_cat5_beta);
-  // 
-  // for (m in 1:R_4_cat5_num){
-  //   c_M_R_4_cat5[m] ~ normal(c_M_R_4_cat5_mean[m], normal_sigma_prior);
-  // }
-  // 
-  /*** M_N_4 ***/
-  // 
-  // gamma_M_N_4_cat3 ~ gamma(gamma_M_N_4_cat3_alpha, gamma_M_N_4_cat3_beta);
-  // 
-  // for (m in 1:N_4_cat3_num){
-  //   c_M_N_4_cat3[m] ~ normal(c_M_N_4_cat3_mean[m], normal_sigma_prior);
-  // }
-  // 
-  /*** M_C_4 ***/
-  // 
-  // mu_M_C_4 ~ normal(mu_M_C_4_mean, normal_sigma_prior);
-  // gamma_M_C_4 ~ gamma(gamma_M_C_4_alpha, gamma_M_C_4_beta);
-  // sigma_M_C_4 ~ gamma(sigma_M_C_4_alpha, sigma_M_C_4_beta);
 
 /*** state variables ***/
 
@@ -1354,7 +1054,8 @@ model {
 
   /*** theta_3 ***/
 
-  epsilon_3[R_3_ind_nomiss] ~ multi_normal_cholesky(rep_row_vector(0,3),L_corr_3);
+  epsilon_3 ~ multi_normal_cholesky(rep_row_vector(0,3),L_corr_3);
+  // epsilon_3[R_3_ind_nomiss] ~ multi_normal_cholesky(rep_row_vector(0,3),L_corr_3);
 
   // for (i in 1:R_2_N_miss){
   // 
@@ -1644,7 +1345,7 @@ generated quantities {
   // matrix[X_num,1] alpha_0 = X_R\alpha_0_tilde;
   // matrix[X_num,2] alpha_1 = X_R\alpha_1_tilde;
   matrix[X_num,3] alpha_2 = X_R\alpha_2_tilde;
-  // matrix[X_num,3] alpha_3 = X_R\alpha_3_tilde;
+  matrix[X_num,3] alpha_3 = X_R\alpha_3_tilde;
   // matrix[X_num,3] alpha_4 = X_R\alpha_4_tilde;
   matrix[X_num,5] alpha_p = X_R\alpha_p_tilde;
 

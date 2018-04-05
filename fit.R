@@ -95,13 +95,10 @@ source("rExtract.R")
 
 for (i in 0:4) rExtract(i)
 
-# Construct prior parameters --------------------------------------------------------
+# Get measurement parameters --------------------------------------------------------
 
-source("mPrior.R")
-
-for (i in (1:nrow(mFrame))) mPrior(mFrame[i,])
-  
-rm(mFrame)
+load("~/bin/JMP/work/measurement_parameters")
+list2env(measurementPars, globalenv())
 
 # Make lists --------------------------------------------------------------
 
@@ -112,26 +109,10 @@ rm(mFrame)
       #      "corr_lambda", "c", 
       # "alpha_0", "sigma_0", #"c_0",
       # "alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1", #"c_1",
-      # "alpha_2", "beta_2", "delta_2", "corr_2", "sigma_2", #  "xi_2", "gamma_2",  #"c_2",
-      # "coef_3", "sigma_3", # "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", "sigma_3", # , #"c_3",
+      "alpha_2", "beta_2", "delta_2", "corr_2", "sigma_2", #  "xi_2", "gamma_2",  #"c_2",
+      "alpha_3", "beta_3", "gamma_3", "xi_3", "delta_3", "corr_3", "sigma_3" # , #"c_3",
       # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", "sigma_4", #"c_4",
       # "alpha_p", #, "gamma_p_", #"c_p",
-      # "gamma_M_R_0_cat3", "c_M_R_0_cat3",
-      # "gamma_M_R_1_cat3", "c_M_R_1_cat3",
-      # "gamma_M_R_1_cat5", "c_M_R_1_cat5",
-      # "gamma_M_N_1_cat5", "c_M_N_1_cat5",
-      # "gamma_M_R_2_cat3", "c_M_R_2_cat3",
-      # "gamma_M_R_2_cat5", "c_M_R_2_cat5",
-      # "gamma_M_N_2_cat3", "c_M_N_2_cat3",
-      "mu_M_C_2", "gamma_M_C_2", "sigma_M_C_2"
-      # "gamma_M_R_3_cat3", "c_M_R_3_cat3",
-      # "gamma_M_R_3_cat5", "c_M_R_3_cat5",
-      # "gamma_M_N_3_cat3", "c_M_N_3_cat3",
-      # "mu_M_C_3", "gamma_M_C_3", "sigma_M_C_3"
-      # "gamma_M_R_4_cat3", "c_M_R_4_cat3",
-      # "gamma_M_R_4_cat5", "c_M_R_4_cat5",
-      # "gamma_M_N_4_cat3", "c_M_N_4_cat3",
-      # "mu_M_C_4", "gamma_M_C_4", "sigma_M_C_4", 
       # "alpha_anchor", "gamma_anchor"
     )
 }
@@ -139,8 +120,7 @@ rm(mFrame)
 {
   # set dimensions for stan 
   
-  dim(I_R_4_cat5_num) <- 1
-  dim(gamma_M_R_4_cat5_mean) <- 1
+ dim(I_R_4_cat5_num) <- 1
 
   # Create stan_data object
   
@@ -165,28 +145,28 @@ rm(mFrame)
          "R_4_cat5_num", "I_R_4_cat5_num", "I_R_4_cat5_ind", "M_R_4_cat5",   
          "N_4_cat3_num", "I_N_4_cat3_num", "I_N_4_cat3_ind", "M_N_4_cat3",
          "C_4_num", "I_C_4_num", "I_C_4_ind", "M_C_4",
-#         "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
+         #         "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
          "R_0_N", "R_0_ind", "R_0_", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1", "R_0_N_nomiss", "R_0_ind_nomiss", "R_0_ind_miss", "R_0_N_miss",
          "R_1_N", "R_1_ind", "R_1_", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1", "R_1_N_nomiss", "R_1_ind_nomiss", "R_1_ind_miss", "R_1_N_miss",
          "R_2_N", "R_2_ind", "R_2_", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1", "R_2_N_nomiss", "R_2_ind_nomiss", "R_2_ind_miss", "R_2_N_miss",
          "R_3_N", "R_3_ind", "R_3_", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1", "R_3_N_nomiss", "R_3_ind_nomiss", "R_3_ind_miss", "R_3_N_miss",
          "R_4_N", "R_4_ind", "R_4_", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1", "R_4_N_nomiss", "R_4_ind_nomiss", "R_4_ind_miss", "R_4_N_miss",
-         "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean",
-         "gamma_M_R_1_cat3_mean", "c_M_R_1_cat3_mean", 
-         "gamma_M_R_1_cat5_mean", "c_M_R_1_cat5_mean",
-         "gamma_M_N_1_cat5_mean", "c_M_N_1_cat5_mean",
-         "gamma_M_R_2_cat3_mean", "c_M_R_2_cat3_mean", 
-         "gamma_M_R_2_cat5_mean", "c_M_R_2_cat5_mean",
-         "gamma_M_N_2_cat3_mean", "c_M_N_2_cat3_mean",
-         "mu_M_C_2_mean", "gamma_M_C_2_mean", "sigma_M_C_2_mean", 
-         "gamma_M_R_3_cat3_mean", "c_M_R_3_cat3_mean", 
-         "gamma_M_R_3_cat5_mean", "c_M_R_3_cat5_mean",
-         "gamma_M_N_3_cat3_mean", "c_M_N_3_cat3_mean",
-         "mu_M_C_3_mean", "gamma_M_C_3_mean", "sigma_M_C_3_mean", 
-         "gamma_M_R_4_cat3_mean", "c_M_R_4_cat3_mean", 
-         "gamma_M_R_4_cat5_mean", "c_M_R_4_cat5_mean",
-         "gamma_M_N_4_cat3_mean", "c_M_N_4_cat3_mean",
-         "mu_M_C_4_mean", "gamma_M_C_4_mean", "sigma_M_C_4_mean"
+         # "gamma_M_R_0_cat3", "c_M_R_0_cat3",
+         # "gamma_M_R_1_cat3", "c_M_R_1_cat3",
+         # "gamma_M_R_1_cat5", "c_M_R_1_cat5",
+         # "gamma_M_N_1_cat5", "c_M_N_1_cat5",
+         "gamma_M_R_2_cat3", "c_M_R_2_cat3",
+         "gamma_M_R_2_cat5", "c_M_R_2_cat5",
+         "gamma_M_N_2_cat3", "c_M_N_2_cat3",
+         "mu_M_C_2", "gamma_M_C_2", "sigma_M_C_2",
+         # "gamma_M_R_3_cat3", "c_M_R_3_cat3",
+         # "gamma_M_R_3_cat5", "c_M_R_3_cat5",
+         # "gamma_M_N_3_cat3", "c_M_N_3_cat3",
+         "mu_M_C_3", "gamma_M_C_3", "sigma_M_C_3"
+         # "gamma_M_R_4_cat3", "c_M_R_4_cat3",
+         # "gamma_M_R_4_cat5", "c_M_R_4_cat5",
+         # "gamma_M_N_4_cat3", "c_M_N_4_cat3",
+         # "mu_M_C_4", "gamma_M_C_4", "sigma_M_C_4", 
        )
   )
   {
@@ -200,18 +180,41 @@ rm(list = c(names(stan_data), names(parNames)))
 # Fit model with stan -----------------------------------------------------
 
 fit_stan = stan(
-  file = 'model_M_C_2.stan',
+  file = 'model.stan',
   data = stan_data,
-  # pars = c(parNames,
-  #          # "theta_0", 
-  #          # "theta_1",
-  #          "theta_R_2",
-  #          "theta_N_2",
-  #          "theta_C_2"
-  #          # "theta_3",
-  #          # "theta_4",
-  # ),
-  include = T,
+  pars = c(parNames,
+           # "lambda",
+           # "theta_0",
+           # "theta_1",
+           "theta_2",
+           "theta_3",
+           # "theta_4",
+           # "xi_1_raw",
+           # "xi_2_raw",
+           "xi_3_raw",
+           # "xi_4_raw",
+           # "delta_1_raw",
+           "delta_2_raw",
+           "delta_3_raw",
+           # "delta_4_raw",
+           # "gamma_1_raw",
+           # "gamma_2_raw",
+           "gamma_3_raw",
+           "gamma_3_11_raw",
+           "gamma_3_22_raw",
+           "gamma_3_33_raw",
+           # "gamma_4_raw",
+           # "beta_1_raw",
+           "beta_2_raw",
+           "beta_3_raw",
+           # "beta_4_raw",
+           # "alpha_0_tilde_raw",
+           # "alpha_1_tilde_raw",
+           "alpha_2_tilde_raw",
+           "alpha_3_tilde_raw",
+           # "alpha_4_tilde_raw",
+            "alpha_p_tilde"
+  ),
   # chains = 1,
   # iter = 10,
   # warmup = 5,
@@ -220,58 +223,8 @@ fit_stan = stan(
   iter = 750,
   warmup = 500,
   refresh = 10,
-  # init_r = .5,
-  control = list(max_treedepth = 10, adapt_delta = .8)
+  init_r = .5,
+  control = list(max_treedepth = 12, adapt_delta = .8)
 )
-
-# fit_stan = stan(
-#   file = 'model.stan',
-#   data = stan_data,
-#   pars = c(parNames,
-#            # "lambda",
-#            # "theta_0", 
-#            # "theta_1",
-#            "theta_2",
-#            "theta_3",
-#            # "theta_4",
-#            # "xi_1_raw",
-#            # "xi_2_raw",
-#            # "xi_3_raw",
-#            # "xi_4_raw",
-#            # "delta_1_raw",
-#            "delta_2_raw",
-#            "coef_C_3_raw",
-#            # "delta_3_raw",
-#            # "delta_4_raw",
-#            # "gamma_1_raw",
-#            # "gamma_2_raw",
-#            # "gamma_3_raw",
-#            # "gamma_3_11_raw",
-#            # "gamma_3_22_raw",
-#            # "gamma_3_33_raw",
-#            # "gamma_4_raw",
-#            # "beta_1_raw",
-#            "beta_2_raw",
-#            # "beta_3_raw",
-#            # "beta_4_raw",
-#            # "alpha_0_tilde_raw",
-#            # "alpha_1_tilde_raw",
-#            "alpha_2_tilde_raw",
-#            # "alpha_3_tilde_raw",
-#            # "alpha_4_tilde_raw",
-#             "alpha_p_tilde"
-#   ),
-#  # include = T,
-#   chains = 1,
-#   iter = 10,
-#   warmup = 5,
-#   refresh = 1,
-#   # chains = 8,
-#   # iter = 750,
-#   # warmup = 500,
-#   # refresh = 10,
-#   init_r = .5,
-#   control = list(max_treedepth = 12, adapt_delta = .8)
-# )
 
 save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit")

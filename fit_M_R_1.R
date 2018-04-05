@@ -65,6 +65,7 @@ rm(list = c(names(stan_data), names(parNames)))
 fit_stan = stan(
   file = 'model_M_R_0.stan',
   data = stan_data,
+  pars = parNames,
   # chains = 1,
   # iter = 10,
   # warmup = 5,

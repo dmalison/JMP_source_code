@@ -4,7 +4,7 @@ rm(list = ls())
 library("rstan")
 library("foreign")
 setwd("~/bin/JMP/JMP_source_code")
-load('~/bin/JMP/work/fit_M_C_3')
+load('~/bin/JMP/work/fit')
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") 
 
 # library("shinystan")
@@ -20,11 +20,15 @@ cbind(
   unlist(stan_data[[paste(i, "mean", sep = "_")]]),
   summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 )
-traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = F)
+traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = T)
 k = k + 1
 
-test = colMeans(extract(fit_stan, pars = "theta_N_2")[[1]])
-plot(test, data_raw$theta_N_2)
+i = paste("alpha_2_tilde_raw[",1:(stan_data$X_num-1), ',2]', sep = "")
+summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
+traceplot(fit_stan, pars = i, inc_warmup = F)
+
+theta_2 = colMeans(extract(fit_stan, pars = "theta_2")[[1]])
+plot(theta_2[,2], data_raw$theta_N_2)
 
 test = colMeans(extract(fit_stan, pars = "theta_N_2")[[1]])
 ind = which(data_raw$R_2 == 1)
@@ -33,10 +37,6 @@ plot(test[ind],data_raw$theta_R_2[ind])
 
 cbind(unlist(stan_data$c_M_R_2_cat3_mean), summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)])
 
-
-i = paste("alpha_2_tilde_raw[",1:(stan_data$X_num-1), ',3]', sep = "")
-summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
-traceplot(fit_stan, pars = i, inc_warmup = F)
 
 i = "xi_3_raw"
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
