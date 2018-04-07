@@ -23,14 +23,28 @@ cbind(
 traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = T)
 k = k + 1
 
-i = paste("alpha_2_tilde_raw[",1:(stan_data$X_num-1), ',2]', sep = "")
+sampler_params <- get_sampler_params(fit_stan, inc_warmup = FALSE)
+
+param = extract(fit_stan, pars = i, permuted = F, inc_warmup = F)
+pairs(cbind(param[,1,],sampler_params[[1]][,"energy__"]))
+
+pairs(sampler_params[[1]][,c("lp__", "energy__")])
+pairs(fit_stan, pars = c("lp__", "gamma_3_raw"))
+
+code <- get_stancode(fit_stan)
+cat(code)
+
+i = paste("alpha_3_tilde_raw[",1:8, ',3]', sep = "")
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = i, inc_warmup = F)
 
 theta_2 = colMeans(extract(fit_stan, pars = "theta_2")[[1]])
+theta_3 = colMeans(extract(fit_stan, pars = "theta_3")[[1]])
 plot(theta_2[,2], data_raw$theta_N_2)
 
-test = colMeans(extract(fit_stan, pars = "theta_N_2")[[1]])
+theta_R_3 = colMeans(extract(fit_stan, pars = "theta_R_3")[[1]])
+
+plot(theta_R_3, data_raw$theta_R_3)
 ind = which(data_raw$R_2 == 1)
 
 plot(test[ind],data_raw$theta_R_2[ind])

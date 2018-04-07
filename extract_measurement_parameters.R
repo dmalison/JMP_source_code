@@ -1,10 +1,8 @@
-# Header ----------------------------------------------------------------
-
 setwd("~/bin/JMP/JMP_source_code")
 
 rm(list = ls())
 
-library("rstan")       # used to sample from posterior using MCMC
+library("rstan")     
 
 # RStan recommends calling the following lines before use
 
@@ -19,6 +17,8 @@ for(
     "~/bin/JMP/work/fit_M_R_2",
     "~/bin/JMP/work/fit_M_N_2",
     "~/bin/JMP/work/fit_M_C_2",
+    "~/bin/JMP/work/fit_M_R_3",
+    "~/bin/JMP/work/fit_M_N_3",
     "~/bin/JMP/work/fit_M_C_3"
   )
 )
