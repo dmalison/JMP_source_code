@@ -109,9 +109,9 @@ list2env(measurementPars, globalenv())
       #      "corr_lambda", "c", 
       # "alpha_0", "sigma_0", #"c_0",
       # "alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1", #"c_1",
-      "alpha_2", "beta_2", "delta_2", "corr_2", "sigma_2" #  "xi_2", "gamma_2",  #"c_2",
-      # "alpha_3", "beta_3", "delta_3", "gamma_3", "xi_3", "corr_3", "sigma_3", #"c_3",
-      # "alpha_4", "beta_4", "gamma_4", "xi_4", "delta_4", "corr_4", "sigma_4", #"c_4",
+      # "alpha_2", "beta_2", "delta_2", "corr_2", "sigma_2", #  "xi_2", "gamma_2",  #"c_2",
+      # "alpha_3", "beta_3", "delta_3", "gamma_3", "xi_3", "corr_3", "sigma_3" #"c_3",
+      "alpha_4", "beta_4", "delta_4", "corr_4", "sigma_4" #  "xi_4", "gamma_4",  #"c_4",
       # "alpha_p", "gamma_p_" #"c_p",
       # "alpha_anchor", "gamma_anchor"
     )
@@ -120,7 +120,8 @@ list2env(measurementPars, globalenv())
 {
   # set dimensions for stan 
   
- dim(I_R_4_cat5_num) <- 1
+  dim(I_R_4_cat5_num) <- 1
+  dim(gamma_M_R_4_cat5) <- 1
 
   # Create stan_data object
   
@@ -186,14 +187,14 @@ fit_stan = stan(
            # "lambda",
            # "theta_0",
            # "theta_1",
-           "theta_2",
+           # "theta_2",
            # "theta_3",
-           # "theta_4"
+           "theta_4",
            # "alpha_0_tilde_raw",
            # "alpha_1_tilde_raw",
-           "alpha_2_tilde"
-           # "alpha_3_tilde_raw",
-           # "alpha_4_tilde_raw",
+           # "alpha_2_tilde",
+           # "alpha_3_tilde"
+           "alpha_4_tilde"
             # "alpha_p_tilde"
   ),
   # chains = 1,
@@ -205,7 +206,8 @@ fit_stan = stan(
   warmup = 500,
   refresh = 10,
   init_r = .5,
-  control = list(max_treedepth = 10, adapt_delta = .8)
+  control = list(max_treedepth = 10, adapt_delta = .8),
+  save_warmup = T
 )
 
 save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit")

@@ -10,7 +10,7 @@ data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta")
 # library("shinystan")
 # launch_shinystan(fit_stan)
 
-traceplot(fit_stan, pars = "lp__", inc_warmup = F)
+traceplot(fit_stan, pars = "lp__", inc_warmup = T)
 summary(fit_stan, "lp__", use_cache = F)[[1]]
 
 k = 1
