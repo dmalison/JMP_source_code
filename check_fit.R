@@ -4,7 +4,7 @@ rm(list = ls())
 library("rstan")
 library("foreign")
 setwd("~/bin/JMP/JMP_source_code")
-load('~/bin/JMP/work/fit_M_N_4')
+load('~/bin/JMP/work/fit')
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") 
 
 # library("shinystan")
@@ -22,6 +22,10 @@ cbind(
 )
 traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = T)
 k = k + 1
+
+i = paste("alpha_2_tilde[",1:stan_data$X_num, ',3]', sep = "")
+summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
+traceplot(fit_stan, pars = i, inc_warmup = F)
 
 sampler_params <- get_sampler_params(fit_stan, inc_warmup = FALSE)
 
