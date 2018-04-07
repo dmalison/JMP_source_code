@@ -4,7 +4,7 @@ rm(list = ls())
 library("rstan")
 library("foreign")
 setwd("~/bin/JMP/JMP_source_code")
-load('~/bin/JMP/work/fit')
+load('~/bin/JMP/work/fit_M_N_4')
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") 
 
 # library("shinystan")
@@ -42,9 +42,9 @@ theta_2 = colMeans(extract(fit_stan, pars = "theta_2")[[1]])
 theta_3 = colMeans(extract(fit_stan, pars = "theta_3")[[1]])
 plot(theta_2[,2], data_raw$theta_N_2)
 
-theta_R_3 = colMeans(extract(fit_stan, pars = "theta_R_3")[[1]])
+theta_C_4 = colMeans(extract(fit_stan, pars = "theta_C_4")[[1]])
 
-plot(theta_R_3, data_raw$theta_R_3)
+plot(theta_C_4, data_raw$theta_C_4)
 ind = which(data_raw$R_2 == 1)
 
 plot(test[ind],data_raw$theta_R_2[ind])

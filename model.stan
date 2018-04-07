@@ -802,54 +802,38 @@ transformed parameters {
     xi_3_[3,3] = gamma_3_33_raw;
 
     /* generate unnormalized latent variables */
-    //
-    //   theta_R_3 =
-    //     X_Q_nocons[R_3_ind1,] * alpha_3_tilde_raw[,1] +
-    //     theta_2[R_3_ind1,1] * gamma_3_[1,1] +
-    // //    lambda[R_3_ind1,1] * c[1] +
-    //     epsilon_3[,1];
-    //
-    //   theta_NC_3[R_3_ind1,] = // theta_NC_3 if R_3 = 1
-    //     X_Q_nocons[R_3_ind1,] * alpha_3_tilde_raw[,2:3] +
-    //     rep_vector(1, R_3_N1) * delta_3_raw +
-    //     theta_2[R_3_ind1,] * xi_3_[,2:3] +
-    // //  lambda[R_3_ind1,2:3] * c_NC_diag +
-    //     epsilon_3*L_corr_3[2:3,]';
-    //
-    //   theta_NC_3[R_3_ind0,] = // theta_NC_3 if R_3 = 0
-    //     X_Q_nocons[R_3_ind0,] * alpha_3_tilde_raw[,2:3] +
-    //     R_2_full[R_3_ind0] * beta_3_raw +
-    //     theta_2[R_3_ind0,] * gamma_3_[,2:3] +
-    // //    lambda[R_3_ind0,2:3] * c_NC_diag +
-    //     epsilon_NC_3_R3eq0*L_corr_3_R3eq0';
 
     theta_R_3[R_3_ind1] =
       X_Q_nocons[R_3_ind1,] * alpha_3_tilde_raw[,1] +
-      // lambda[,1] * c[1] +
+      // lambda[R_3_ind1,1] * c[1] +
       epsilon_2_n[R_3_ind1,] * gamma_3_[,1] +
       epsilon_3_[R_3_ind1,1];
 
     theta_N_3[R_3_ind0] =
       X_Q_nocons[R_3_ind0,]*alpha_3_tilde_raw[,2] +
       beta_3_raw[1]*R_2[R_3_ind0] +
+      // lambda[R_3_ind0,2] * c[2] +
       epsilon_2_n[R_3_ind0,] * gamma_3_[,2] +
       epsilon_3_[R_3_ind0,2];
 
     theta_N_3[R_3_ind1] =
       X_Q_nocons[R_3_ind1,]*alpha_3_tilde_raw[,2] +
       delta_3_raw[1] +
+      // lambda[R_3_ind1,2] * c[2] +
       epsilon_2_n[R_3_ind1,] * xi_3_[,2] +
       epsilon_3_[R_3_ind1,2];
 
     theta_C_3[R_3_ind0] =
       X_Q_nocons[R_3_ind0,]*alpha_3_tilde_raw[,3] +
       beta_3_raw[2]*R_2[R_3_ind0] +
+      // lambda[R_3_ind0,3] * c[3] +
       epsilon_2_n[R_3_ind0,] * gamma_3_[,3] +
       epsilon_3_[R_3_ind0,3];
 
     theta_C_3[R_3_ind1] =
       X_Q_nocons[R_3_ind1,]*alpha_3_tilde_raw[,3] +
       delta_3_raw[2] +
+      // lambda[R_3_ind`,3] * c[3] +
       epsilon_2_n[R_3_ind1,] * xi_3_[,3] +
       epsilon_3_[R_3_ind1,3];
     
@@ -878,7 +862,7 @@ transformed parameters {
     delta_3[2:3] = delta_3_raw ./ theta_3_sd[2:3];
     xi_3    = xi_3_ ./ (rep_vector(1,3) * theta_3_sd);
     sigma_3 = rep_row_vector(1,3) ./ theta_3_sd;
-    // c_3 = c[1:3] ./ theta_3_sd';
+    // c_3 = c[1:3] ./ theta_3_sd;
   }
   /*** assign theta_4 ***/
   // {

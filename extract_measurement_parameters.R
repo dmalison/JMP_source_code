@@ -19,7 +19,10 @@ for(
     "~/bin/JMP/work/fit_M_C_2",
     "~/bin/JMP/work/fit_M_R_3",
     "~/bin/JMP/work/fit_M_N_3",
-    "~/bin/JMP/work/fit_M_C_3"
+    "~/bin/JMP/work/fit_M_C_3",
+    "~/bin/JMP/work/fit_M_R_4",
+    "~/bin/JMP/work/fit_M_N_4",
+    "~/bin/JMP/work/fit_M_C_4"
   )
 )
 {
