@@ -21,9 +21,9 @@ N <- nrow(data_raw) # number of observations
 
 mFrame <- # contains variable, period, and number of categories
   data.frame(
-    variable = "R",
-    period = 0,
-    n_cat = 3,
+    variable = c("R","R"),
+    period = c(1,1),
+    n_cat = c(3,5),
     stringsAsFactors = F
   )
 
@@ -42,15 +42,17 @@ rm(mFrame)
 # Make lists --------------------------------------------------------------
 
 # parNames: list of parameter names
-parNames = c("gamma_M_R_0_cat3", "c_M_R_0_cat3")
+parNames = c("gamma_M_R_1_cat3", "c_M_R_1_cat3", "gamma_M_R_1_cat5", "c_M_R_1_cat5")
 
 # stan_data: list of objects used by stan program
 stan_data <- list()
 
 for (i in 
      c("N",
-       "R_0_cat3_num", "I_R_0_cat3_num", "I_R_0_cat3_ind", "M_R_0_cat3",
-       "gamma_M_R_0_cat3_mean", "c_M_R_0_cat3_mean"
+       "R_1_cat3_num", "I_R_1_cat3_num", "I_R_1_cat3_ind", "M_R_1_cat3",
+       "gamma_M_R_1_cat3_mean", "c_M_R_1_cat3_mean",
+       "R_1_cat5_num", "I_R_1_cat5_num", "I_R_1_cat5_ind", "M_R_1_cat5",
+       "gamma_M_R_1_cat5_mean", "c_M_R_1_cat5_mean"
      )
 )
 {
@@ -63,9 +65,9 @@ rm(list = c(names(stan_data), names(parNames)))
 # Fit model with stan -----------------------------------------------------
 
 fit_stan = stan(
-  file = 'model_M_R_0.stan',
-  data = stan_data,
+  file = 'model_M_R_1.stan',
   pars = parNames,
+  data = stan_data,
   # chains = 1,
   # iter = 10,
   # warmup = 5,
@@ -76,4 +78,4 @@ fit_stan = stan(
   refresh = 10
 )
 
-save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit_M_R_0")
+save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit_M_R_1")

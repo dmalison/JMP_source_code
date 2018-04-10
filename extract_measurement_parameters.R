@@ -14,6 +14,8 @@ measurementPars = list()
 for(
   filename in 
   c(
+    "~/bin/JMP/work/fit_M_R_1",
+    "~/bin/JMP/work/fit_M_N_1",
     "~/bin/JMP/work/fit_M_R_2",
     "~/bin/JMP/work/fit_M_N_2",
     "~/bin/JMP/work/fit_M_C_2",
