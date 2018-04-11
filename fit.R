@@ -107,11 +107,11 @@ list2env(measurementPars, globalenv())
   parNames =
     c(
       #      "corr_lambda", "c", 
-      # "alpha_0", "sigma_0", #"c_0",
-      # "alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1", #"c_1",
-      "alpha_2", "beta_2", "delta_2", "corr_2", "sigma_2", #  "xi_2", "gamma_2",  #"c_2",
-      "alpha_3", "beta_3", "gamma_3", "delta_3", "xi_3", "corr_3", "sigma_3",  #"c_3",
-      "alpha_4", "beta_4", "gamma_4", "delta_4", "xi_4", "corr_4", "sigma_4"  #"c_4",
+      "alpha_0", "sigma_0", #"c_0",
+      "alpha_1", "beta_1", "gamma_1", "xi_1", "delta_1", "corr_1", "sigma_1" #"c_1",
+      # "alpha_2", "beta_2", "delta_2", "corr_2", "sigma_2", #  "xi_2", "gamma_2",  #"c_2",
+      # "alpha_3", "beta_3", "gamma_3", "delta_3", "xi_3", "corr_3", "sigma_3",  #"c_3",
+      # "alpha_4", "beta_4", "gamma_4", "delta_4", "xi_4", "corr_4", "sigma_4"  #"c_4",
       # "alpha_p", "gamma_p_" #"c_p",
       # "alpha_anchor", "gamma_anchor"
     )
@@ -152,7 +152,7 @@ list2env(measurementPars, globalenv())
          "R_2_N", "R_2_ind", "R_2_", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1", "R_2_N_nomiss", "R_2_ind_nomiss", "R_2_ind_miss", "R_2_N_miss",
          "R_3_N", "R_3_ind", "R_3_", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1", "R_3_N_nomiss", "R_3_ind_nomiss", "R_3_ind_miss", "R_3_N_miss",
          "R_4_N", "R_4_ind", "R_4_", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1", "R_4_N_nomiss", "R_4_ind_nomiss", "R_4_ind_miss", "R_4_N_miss",
-         # "gamma_M_R_0_cat3", "c_M_R_0_cat3",
+         "gamma_M_R_0_cat3", "c_M_R_0_cat3",
          "gamma_M_R_1_cat3", "c_M_R_1_cat3",
          "gamma_M_R_1_cat5", "c_M_R_1_cat5",
          "gamma_M_N_1_cat5", "c_M_N_1_cat5",
@@ -185,16 +185,16 @@ fit_stan = stan(
   data = stan_data,
   pars = c(parNames,
            # "lambda",
-           # "theta_0",
-           # "theta_1",
-           "theta_2",
-           "theta_3",
-           "theta_4",
-           # "alpha_0_tilde_raw",
-           # "alpha_1_tilde_raw",
-           "alpha_2_tilde",
-           "alpha_3_tilde",
-           "alpha_4_tilde"
+           "theta_0",
+           "theta_1",
+           # "theta_2",
+           # "theta_3",
+           # "theta_4",
+           "alpha_0_tilde",
+           "alpha_1_tilde"
+           # "alpha_2_tilde",
+           # "alpha_3_tilde",
+           # "alpha_4_tilde"
             # "alpha_p_tilde"
   ),
   chains = 1,
@@ -202,12 +202,16 @@ fit_stan = stan(
   warmup = 5,
   refresh = 1,
   # chains = 8,
-  # iter = 1250,
+  # iter = 750,
+  # warmup = 500,
+  # refresh = 10,
+  # chains = 8,
+  # iter = 1625,
   # warmup = 1000,
   # refresh = 10,
+  # save_warmup = F,
   init_r = .5,
-  control = list(max_treedepth = 12, adapt_delta = .8),
-  save_warmup = F
+  control = list(max_treedepth = 10, adapt_delta = .8)
 )
 
 save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit")
