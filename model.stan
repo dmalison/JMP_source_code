@@ -504,8 +504,8 @@ parameters {
 
 /*** relationship indicators ***/
 
-  matrix[X_num,5] alpha_p_tilde;
-  vector[5] gamma_p_; // (extra undercore at end because gamma_p is a protected function)
+  matrix[X_num,4] alpha_p_tilde;
+  vector[4] gamma_p_; // (extra undercore at end because gamma_p is a protected function)
 
 /*** anchors ***/
   
@@ -689,7 +689,7 @@ transformed parameters {
     theta_N_2[R_2_ind1] =
       X_Q[R_2_ind1,] * alpha_2_tilde[,2] +
       beta_2[2] + delta_2[2] +
-      epsilon_1[R_2_ind1,] * gamma_2[,2] +
+      epsilon_1[R_2_ind1,] * xi_2[,2] +
       epsilon_2[R_2_ind1,2];
 
     theta_C_2[R_2_ind0] =
@@ -701,7 +701,7 @@ transformed parameters {
     theta_C_2[R_2_ind1] =
       X_Q[R_2_ind1,] * alpha_2_tilde[,3] +
       beta_2[3] + delta_2[3] +
-      epsilon_1[R_2_ind1,] * gamma_2[,3] +
+      epsilon_1[R_2_ind1,] * xi_2[,3] +
       epsilon_2[R_2_ind1,3];
 
     theta_2[,1] = theta_R_2;
@@ -847,9 +847,9 @@ model {
   
   /*** indicators ***/
 
-   // to_vector(alpha_p_tilde)
-   //   ~ normal(normal_mu_prior, normal_sigma_prior);
-   //  gamma_p_ ~ normal(normal_mu_prior, normal_sigma_prior);
+   to_vector(alpha_p_tilde)
+     ~ normal(normal_mu_prior, normal_sigma_prior);
+    gamma_p_ ~ normal(normal_mu_prior, normal_sigma_prior);
 
   /*** theta_0 ***/
   
@@ -1210,7 +1210,7 @@ generated quantities {
   matrix[X_num,3] alpha_2 = X_R\alpha_2_tilde;
   matrix[X_num,3] alpha_3 = X_R\alpha_3_tilde;
   matrix[X_num,3] alpha_4 = X_R\alpha_4_tilde;
-  matrix[X_num,5] alpha_p = X_R\alpha_p_tilde;
+  matrix[X_num,4] alpha_p = X_R\alpha_p_tilde;
 
   //  matrix[X_num,anchor_num] alpha_anchor = X_R\alpha_anchor_tilde;
 

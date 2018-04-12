@@ -39,6 +39,7 @@ gen educ_cat_f = cf1edu  if cf1edu >= 0
 * Mother's race
 
 gen race_m = cm1ethrace if cm1ethrace >= 0
+replace race_m = 4 if race_m == .
 
 recode race_m (4 = 1) 
 // recode others as white because only <5% of sample
@@ -48,6 +49,7 @@ recode race_m (4 = 1)
 
 gen race_f = cf1ethrace if cf1ethrace >= 0
 
+replace race_f = 4 if race_f == .
 recode race_f (4 = 1)
 // recode others as white because only <5% of sample
 // 55% of the "others" group are Asian
@@ -55,10 +57,12 @@ recode race_f (4 = 1)
 * How often mother attends religious services
 
 gen religious_m = m1f6 if m1f6 >= 0
+replace religious_m = 5 if religious_m == .
 
 * Child gender
 
 gen female = (cm1bsex == 2) if cm1bsex >= 0
+replace female = 0 if female == .
 
 * Mother's age at birth
 
@@ -262,6 +266,9 @@ replace R_4 = 0 if R_1 == 0
 	*** Use father's report if mother's report missing
 	replace siblings = (f2a11 >= 2) if f2a11 > 0 & f2a11 < . & siblings == . 
 
+	*** Code as zero if missing
+	replace siblings = 0 if siblings == .
+
 * M has children with other father
 
 	*** If parents are not in a relationship at child's birth, 
@@ -276,12 +283,15 @@ replace R_4 = 0 if R_1 == 0
 	
 	egen half_siblings = rowmax(M_oth_chd_wo_F F_oth_chd_wo_M)
 	
+	replace half_siblings = 0 if half_siblings == .
+	
 * Update father's schooling
 
 	replace educ_cat_f = 1 if (f2k1a == 2 | f2k1a == 3) & educ_cat_f == .
 	replace educ_cat_f = 2 if (f2k1a == 4 | f2k1a == 5) & educ_cat_f == .
 	replace educ_cat_f = 3 if (f2k1a == 6) & educ_cat_f == .
 	replace educ_cat_f = 4 if (f2k1a == 8) & educ_cat_f == .
+	replace educ_cat_f = 0 if educ_cat_f == .
 
 }
 *** GENERATE FIRST YEAR RELATIONSHIP QUALITY MEASUREMENTS ***
@@ -1211,7 +1221,9 @@ local covariates ///
       half_siblings ///
       female ///
       religious_m
-        
+
+misstable sum `covariates'
+
 keep `covariates'  R_? theta_?_* M_?_?_* anchor* returner social_f
 }
 *** KEEP OBSERVATION FOR ANALYSIS ***
