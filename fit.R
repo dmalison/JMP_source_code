@@ -17,6 +17,8 @@ options(mc.cores = parallel::detectCores())
 data_raw <- read.dta("~/data/Fragile_Families/extract/extract_noretro.dta") # load data created by Stata extract do file
 N <- nrow(data_raw) # number of observations
 
+# Construct covariate matrix ---------------------------------------------
+
 # Covariate list
 covariates <- c("educ_cat_m",     # Mother's education at baseline
                 "race_m",         # Mother's race
@@ -29,8 +31,6 @@ covariates <- c("educ_cat_m",     # Mother's education at baseline
                 "female",         # Child gender
                 "religious_m"    # How often mother attends religious services
 )
-
-# Construct covariate matrix ---------------------------------------------
 
 # Turn discrete variables into factors so that it is easy to make design matrix with lm
 
@@ -106,13 +106,13 @@ list2env(measurementPars, globalenv())
 {
   parNames =
     c(
-      #      "corr_lambda", "c", 
-      "alpha_0", "sigma_0", #"c_0",
-      "alpha_1", "beta_1", "delta_1", "gamma_1", "xi_1", "corr_1", "sigma_1",  #"c_1",
-      "alpha_2", "beta_2", "delta_2", "gamma_2", "xi_2", "corr_2", "sigma_2",  #"c_2",
-      "alpha_3", "beta_3", "delta_3", "gamma_3", "xi_3", "corr_3", "sigma_3",  #"c_3",
-      "alpha_4", "beta_4", "delta_4", "gamma_4", "xi_4", "corr_4", "sigma_4",  #"c_4",
-      "alpha_p", "gamma_p_" #"c_p",
+      # "corr_lambda", #"c",
+      "alpha_0", "sigma_0", "c_0",
+      "alpha_1", "beta_1", "delta_1", "gamma_1", "xi_1", "corr_1", "sigma_1",  "c_1",
+      "alpha_2", "beta_2", "delta_2", "gamma_2", "xi_2", "corr_2", "sigma_2",  "c_2",
+      "alpha_3", "beta_3", "delta_3", "gamma_3", "xi_3", "corr_3", "sigma_3",  "c_3",
+      "alpha_4", "beta_4", "delta_4", "gamma_4", "xi_4", "corr_4", "sigma_4",  "c_4",
+      "alpha_p", "gamma_p_", "c_p"
       # "alpha_anchor", "gamma_anchor"
     )
 }
@@ -184,7 +184,7 @@ fit_stan = stan(
   file = 'model.stan',
   data = stan_data,
   pars = c(parNames,
-           # "lambda",
+           "lambda",
            "theta_0",
            "theta_1",
            "theta_2",

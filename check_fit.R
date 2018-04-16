@@ -27,6 +27,9 @@ i = paste("alpha_2_tilde[",1:stan_data$X_num, ',3]', sep = "")
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = i, inc_warmup = F)
 
+i = c("c_0", "c_1", "c_2", "c_3", "c_4")
+traceplot(fit_stan, pars = i)
+
 sampler_params <- get_sampler_params(fit_stan, inc_warmup = FALSE)
 
 param = extract(fit_stan, pars = i, permuted = F, inc_warmup = F)
