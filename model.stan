@@ -684,7 +684,7 @@ transformed parameters {
 
     theta_N_2[R_2_ind0] =
       X_Q[R_2_ind0,] * alpha_2_tilde[,2] +
-      beta_2[2]  * R_1[R_2_ind0] +
+      beta_2[2] * R_1[R_2_ind0] +
       //lambda[R_2_ind0,2] + //* c_2[2] +
       lambda[R_2_ind0]*c_2[2] +
       epsilon_1[R_2_ind0,] * gamma_2[,2] +

@@ -29,11 +29,13 @@ for (i in 0:4){
 
 # Extract parameters from fit_stan ------------------------------------------------------
 
-for (i in c(parNames, "theta_0", "theta_1", "theta_2", "theta_3")){
+for (i in c(parNames, "theta_0", "theta_1", "theta_2", "theta_3", "theta_4", "lambda")){
   x <- extract(fit_stan, pars = i)[[1]]
   assign(i,x)
   rm(i,x)
 }
+
+nDraws = length(extract(fit_stan, pars = "lp__")[[1]])
 
 # Construct propensity scores ----------------------------------------------
 
@@ -44,7 +46,8 @@ for (i in 1:4){
   p <- 
     pnorm(
       tcrossprod(alpha_p[,,i],X) + 
-        gamma_p_[,1,i] * theta_R + gamma_p_[,2,i] * theta_R^2
+        gamma_p_[,i] * theta_R +
+        c_p[,i] * lambda
     )
   
   assign(paste("p", i, sep = "_"), p)
@@ -58,6 +61,8 @@ for (i in 1:4){
 x_out <- seq(0,1, length.out = 21)
 sep_col <- rgb(1,0,0,.5)
 tog_col <- rgb(0,0,1,.5)
+
+par(mfrow=c(2,2))
 
 for (i in 1:4){
   
@@ -93,12 +98,13 @@ for (i in 1:4){
   )
   
   legend(
-    x = "top",
+    x = "topleft",
     legend = parse(text = paste("R[", i, "] == ", 0:1, sep="")),
     bty = "n",
     fill = c(sep_col, tog_col),
-    horiz = T,
-    x.intersp = .5
+    horiz = F,
+    ncol = 1,
+    y.intersp = 1.1
   )
   
 }
