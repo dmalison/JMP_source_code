@@ -106,13 +106,12 @@ list2env(measurementPars, globalenv())
 {
   parNames =
     c(
-      "corr_lambda", "sigma_lambda",
-      "alpha_0", "sigma_0", 
+      "alpha_0", "sigma_0",
       "alpha_1", "beta_1", "delta_1", "gamma_1", "xi_1", "corr_1", "sigma_1",  
       "alpha_2", "beta_2", "delta_2", "gamma_2", "xi_2", "corr_2", "sigma_2",  
       "alpha_3", "beta_3", "delta_3", "gamma_3", "xi_3", "corr_3", "sigma_3",  
       "alpha_4", "beta_4", "delta_4", "gamma_4", "xi_4", "corr_4", "sigma_4",  
-      "alpha_p", "gamma_p_", "c_p"
+      "alpha_p", "gamma_p_"
       # "alpha_anchor", "gamma_anchor"
     )
 }
@@ -122,7 +121,7 @@ list2env(measurementPars, globalenv())
   
   dim(I_R_4_cat5_num) <- 1
   dim(gamma_M_R_4_cat5) <- 1
-
+  
   # Create stan_data object
   
   stan_data <- list()
@@ -181,10 +180,9 @@ rm(list = c(names(stan_data), names(parNames)))
 # Fit model with stan -----------------------------------------------------
 
 fit_stan = stan(
-  file = 'model.stan',
+  file = 'model_noFE.stan',
   data = stan_data,
   pars = c(parNames,
-           "lambda",
            "theta_0",
            "theta_1",
            "theta_2",
@@ -210,4 +208,4 @@ fit_stan = stan(
   control = list(max_treedepth = 12, adapt_delta = .8)
 )
 
-save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit")
+save(list = c("stan_data", "fit_stan", "parNames"), file = "~/bin/JMP/work/fit_noFE")

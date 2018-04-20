@@ -429,15 +429,13 @@ parameters {
 
 /*** lambda ***/
 
-  // matrix[N,3] lambda_raw;
-  // cholesky_factor_corr[3] L_corr_lambda;
-
-  vector[N] lambda;
+  matrix[N,3] lambda_raw;
+  cholesky_factor_corr[3] L_corr_lambda;
+  vector<lower = 0, upper = 1>[3] sigma_lambda;
 
 /*** theta_0 ***/
 
   matrix[X_num,1]  alpha_0_tilde;
-  row_vector<lower = 0>[1] c_0;
   vector<lower = 0, upper = 1>[1] sigma_0;
   
   matrix[R_0_N1,1] epsilon_0_R0eq1;
@@ -450,7 +448,6 @@ parameters {
   row_vector[1] gamma_1_;
   row_vector[1] xi_1_;
   row_vector[1] delta_1_;
-  row_vector<lower = 0>[2] c_1;
   cholesky_factor_corr[2] L_corr_1;
   vector<lower = 0, upper = 1>[2] sigma_1;
 
@@ -466,7 +463,6 @@ parameters {
   row_vector[3] gamma_2_;
   row_vector[2] delta_2_;
   row_vector[2] xi_2_;
-  row_vector<lower = 0>[3] c_2;
   cholesky_factor_corr[3] L_corr_2;
   vector<lower = 0, upper = 1>[3] sigma_2;
 
@@ -483,7 +479,6 @@ parameters {
   row_vector[4] gamma_3_;
   row_vector[2] delta_3_;
   row_vector[2] xi_3_;
-  row_vector<lower = 0>[3] c_3;
   cholesky_factor_corr[3] L_corr_3;
   vector<lower = 0, upper = 1>[3] sigma_3;
 
@@ -500,7 +495,6 @@ parameters {
   row_vector[4] gamma_4_;
   row_vector[2] delta_4_;
   row_vector[2] xi_4_;
-  row_vector<lower = 0>[3] c_4;
   cholesky_factor_corr[3] L_corr_4;
   vector<lower = 0, upper = 1>[3] sigma_4;
 
@@ -523,7 +517,7 @@ transformed parameters {
 
 /*** declare lambda ***/
 
-//   matrix[N,3] lambda;
+  matrix[N,3] lambda;
 
 /*** declare structural parameters ***/
 
@@ -568,7 +562,7 @@ transformed parameters {
   
 /*** assign lambda ***/ 
 
-//  lambda = lambda_raw * L_corr_lambda';
+ lambda = lambda_raw * L_corr_lambda' * diag_matrix(sigma_lambda);
 
 {
   /*** declare and assign epsilons ***/ 
@@ -604,8 +598,7 @@ transformed parameters {
 
     theta_R_0[R_0_ind1] =
       X_Q[R_0_ind1,]*alpha_0_tilde[,1] +
-      // lambda[R_0_ind1,1] + //*c_0[1] +
-      lambda[R_0_ind1]*c_0[1] +
+      lambda[R_0_ind1,1] + 
       epsilon_0[R_0_ind1,1];
 
     theta_0[,1] = theta_R_0;
@@ -628,24 +621,21 @@ transformed parameters {
 
     theta_R_1[R_1_ind1] =
       X_Q[R_1_ind1,]*alpha_1_tilde[,1] +
-      //lambda[R_1_ind1,1] + //*c_1[1] +
-      lambda[R_1_ind1]*c_1[1] +
+      lambda[R_1_ind1,1] + 
       epsilon_0[R_1_ind1,]*gamma_1[,1] +
       epsilon_1[R_1_ind1,1];
 
     theta_N_1[R_1_ind0] =
       X_Q[R_1_ind0,]*alpha_1_tilde[,2] +
       beta_1[2]*R_0[R_1_ind0] +
-      //lambda[R_1_ind0,2] + //*c_1[2] +
-      lambda[R_1_ind0]*c_1[2] +
+      lambda[R_1_ind0,2] + 
       epsilon_0[R_1_ind0,]*gamma_1[,2] +
       epsilon_1[R_1_ind0,2];
 
     theta_N_1[R_1_ind1] =
       X_Q[R_1_ind1,]*alpha_1_tilde[,2] +
       beta_1[2] + delta_1[2] +
-      //lambda[R_1_ind1,2] + //*c_1[2] +
-      lambda[R_1_ind1]*c_1[2] +
+      lambda[R_1_ind1,2] + 
       epsilon_0[R_1_ind1,]*xi_1[,2] +
       epsilon_1[R_1_ind1,2];
 
@@ -677,40 +667,36 @@ transformed parameters {
 
     theta_R_2[R_2_ind1] =
       X_Q[R_2_ind1,] * alpha_2_tilde[,1] +
-      //lambda[R_2_ind1,1] + //* c_2[1] +
-      lambda[R_2_ind1]*c_2[1] +
+      lambda[R_2_ind1,1] + 
       epsilon_1[R_2_ind1,] * gamma_2[,1] +
       epsilon_2[R_2_ind1,1];
 
     theta_N_2[R_2_ind0] =
       X_Q[R_2_ind0,] * alpha_2_tilde[,2] +
       beta_2[2] * R_1[R_2_ind0] +
-      //lambda[R_2_ind0,2] + //* c_2[2] +
-      lambda[R_2_ind0]*c_2[2] +
+      lambda[R_2_ind0,2] + 
       epsilon_1[R_2_ind0,] * gamma_2[,2] +
       epsilon_2[R_2_ind0,2];
 
     theta_N_2[R_2_ind1] =
       X_Q[R_2_ind1,] * alpha_2_tilde[,2] +
       beta_2[2] + delta_2[2] +
-      //lambda[R_2_ind1,2] + //* c_2[2] +
-      lambda[R_2_ind1]*c_2[2] +
+      lambda[R_2_ind1,2] + 
       epsilon_1[R_2_ind1,] * xi_2[,2] +
       epsilon_2[R_2_ind1,2];
 
     theta_C_2[R_2_ind0] =
       X_Q[R_2_ind0,] * alpha_2_tilde[,3] +
       beta_2[3]  * R_1[R_2_ind0] +
-      //lambda[R_2_ind0,3] + //* c_2[3] +
-      lambda[R_2_ind0]*c_2[3] +
+      lambda[R_2_ind0,3] + //* c_2[3] +
+      // lambda[R_2_ind0]*c_2[3] +
       epsilon_1[R_2_ind0,] * gamma_2[,3] +
       epsilon_2[R_2_ind0,3];
 
     theta_C_2[R_2_ind1] =
       X_Q[R_2_ind1,] * alpha_2_tilde[,3] +
       beta_2[3] + delta_2[3] +
-      //lambda[R_2_ind1,3] + // * c_2[3] +
-      lambda[R_2_ind1]*c_2[3] +
+      lambda[R_2_ind1,3] + 
       epsilon_1[R_2_ind1,] * xi_2[,3] +
       epsilon_2[R_2_ind1,3];
 
@@ -745,40 +731,35 @@ transformed parameters {
 
     theta_R_3[R_3_ind1] =
       X_Q[R_3_ind1,]*alpha_3_tilde[,1] +
-      //lambda[R_3_ind1,1] + // * c_3[1] +
-      lambda[R_3_ind1] * c_3[1] +
+      lambda[R_3_ind1,1] + 
       epsilon_2[R_3_ind1,] * gamma_3[,1] +
       epsilon_3[R_3_ind1,1];
 
     theta_N_3[R_3_ind0] =
       X_Q[R_3_ind0,]*alpha_3_tilde[,2] +
       beta_3[2]*R_2[R_3_ind0] +
-      //lambda[R_3_ind0,2] + //* c_3[2] +
-      lambda[R_3_ind0]*c_3[2] +
+      lambda[R_3_ind0,2] + 
       epsilon_2[R_3_ind0,]*gamma_3[,2] +
       epsilon_3[R_3_ind0,2];
 
     theta_N_3[R_3_ind1] =
       X_Q[R_3_ind1,]*alpha_3_tilde[,2] +
       beta_3[2] + delta_3[2] +
-      //lambda[R_3_ind1,2] + //* c_3[2] +
-      lambda[R_3_ind1]*c_3[2] +
+      lambda[R_3_ind1,2] + 
       epsilon_2[R_3_ind1,] * xi_3[,2] +
       epsilon_3[R_3_ind1,2];
 
     theta_C_3[R_3_ind0] =
       X_Q[R_3_ind0,]*alpha_3_tilde[,3] +
       beta_3[3]*R_2[R_3_ind0] +
-      //lambda[R_3_ind0,3] + // * c_3[3] +
-      lambda[R_3_ind0]*c_3[3] +
+      lambda[R_3_ind0,3] + 
       epsilon_2[R_3_ind0,]*gamma_3[,3] +
       epsilon_3[R_3_ind0,3];
 
     theta_C_3[R_3_ind1] =
       X_Q[R_3_ind1,]*alpha_3_tilde[,3] +
       beta_3[3] + delta_3[3] +
-      //lambda[R_3_ind1,3] + //* c_3[3] +
-      lambda[R_3_ind1]*c_3[3] +
+      lambda[R_3_ind1,3] + 
       epsilon_2[R_3_ind1,] * xi_3[,3] +
       epsilon_3[R_3_ind1,3];
 
@@ -813,40 +794,35 @@ transformed parameters {
 
     theta_R_4[R_4_ind1] =
       X_Q[R_4_ind1,]*alpha_4_tilde[,1] +
-      //lambda[R_4_ind1,1] + // * c_4[1] +
-      lambda[R_4_ind1]*c_4[1] +
+      lambda[R_4_ind1,1] + 
       epsilon_3[R_4_ind1,] * gamma_4[,1] +
       epsilon_4[R_4_ind1,1];
 
     theta_N_4[R_4_ind0] =
       X_Q[R_4_ind0,]*alpha_4_tilde[,2] +
       beta_4[2]*R_3[R_4_ind0] +
-      //lambda[R_4_ind0,2] + // * c_4[2] +
-      lambda[R_4_ind0]*c_4[2] +
+      lambda[R_4_ind0,2] + 
       epsilon_3[R_4_ind0,] * gamma_4[,2] +
       epsilon_4[R_4_ind0,2];
 
     theta_N_4[R_4_ind1] =
       X_Q[R_4_ind1,]*alpha_4_tilde[,2] +
       beta_4[2] + delta_4[2] +
-      //lambda[R_4_ind1,2] + //* c_4[2] +
-      lambda[R_4_ind1]*c_4[2] +
+      lambda[R_4_ind1,2] + 
       epsilon_3[R_4_ind1,] * xi_4[,2] +
       epsilon_4[R_4_ind1,2];
 
     theta_C_4[R_4_ind0] =
       X_Q[R_4_ind0,]*alpha_4_tilde[,3] +
       beta_4[3]*R_3[R_4_ind0] +
-      //lambda[R_4_ind0,3] + //* c_4[3] +
-      lambda[R_4_ind0]*c_4[3] +
+      lambda[R_4_ind0,3] + 
       epsilon_3[R_4_ind0,] * gamma_4[,3] +
       epsilon_4[R_4_ind0,3];
 
     theta_C_4[R_4_ind1] =
       X_Q[R_4_ind1,]*alpha_4_tilde[,3] +
       beta_4[3] + delta_4[3] +
-      //lambda[R_4_ind1,3] + // * c_4[3] +
-      lambda[R_4_ind1]*c_4[3] +
+      lambda[R_4_ind1,3] + 
       epsilon_3[R_4_ind1,] * xi_4[,3] +
       epsilon_4[R_4_ind1,3];
 
@@ -865,14 +841,13 @@ model {
    to_vector(alpha_p_tilde)
      ~ normal(normal_mu_prior, normal_sigma_prior);
     gamma_p_ ~ normal(normal_mu_prior, normal_sigma_prior);
-  c_p ~ normal(normal_mu_prior, normal_sigma_prior);
+    c_p ~ normal(normal_mu_prior, normal_sigma_prior);
 
   /*** theta_0 ***/
   
   to_vector(alpha_0_tilde)
            ~ normal(normal_mu_prior, normal_sigma_prior);
-  c_0      ~ gamma(1,1);
-  sigma_0  ~ beta(3,1.5);
+  sigma_0  ~ beta(6,1.5);
 
   /*** theta_1 ***/
   
@@ -880,10 +855,9 @@ model {
               ~ normal(normal_mu_prior, normal_sigma_prior);
   beta_1_     ~ normal(normal_mu_prior, normal_sigma_prior);
   gamma_1_    ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_1_11_ ~ gamma(1.5,1.5);
+  gamma_1_11_ ~ gamma(2,2);
   delta_1_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_1_       ~ normal(normal_mu_prior, normal_sigma_prior);
-  c_1         ~ gamma(1,1);
   L_corr_1    ~ lkj_corr_cholesky(lkj_eta_prior_2);
   sigma_1[1]  ~ beta(1.5,1.5);
   sigma_1[2]  ~ beta(3,1.5);
@@ -898,7 +872,6 @@ model {
   gamma_2_22_ ~ gamma(1.5,1.5);
   delta_2_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_2_       ~ normal(normal_mu_prior, normal_sigma_prior);
-  c_2         ~ gamma(1,1);
   L_corr_2    ~ lkj_corr_cholesky(lkj_eta_prior_3);
   sigma_2[1:2] ~ beta(1.5,1.5);
   sigma_2[3]   ~ beta(3,1.5);
@@ -914,7 +887,6 @@ model {
   gamma_3_33_ ~ gamma(1.5,1.5);
   delta_3_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_3_       ~ normal(normal_mu_prior, normal_sigma_prior);
-  c_3         ~ gamma(1,1);
   L_corr_3    ~ lkj_corr_cholesky(lkj_eta_prior_3);
   sigma_3     ~ beta(1.5,1.5);
 
@@ -929,7 +901,6 @@ model {
   gamma_4_33_ ~ gamma(1.5,1.5);
   delta_4_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_4_       ~ normal(normal_mu_prior, normal_sigma_prior);
-  c_4         ~ gamma(1,1);
   L_corr_4    ~ lkj_corr_cholesky(lkj_eta_prior_3);
   sigma_4     ~ beta(1.5,1.5);
   
@@ -942,9 +913,9 @@ model {
 
   /*** lambda ***/
 
-  lambda ~ normal(0,1);
-//  to_vector(lambda_raw)  ~ normal(0,1);
-//  L_corr_lambda  ~ lkj_corr_cholesky(lkj_eta_prior_3);
+   to_vector(lambda_raw)  ~ normal(0,1);
+  L_corr_lambda  ~ lkj_corr_cholesky(lkj_eta_prior_3);
+  sigma_lambda ~ beta(1.5,1.5);
 
   /*** theta_0 ***/
 
@@ -977,10 +948,9 @@ model {
   R_1_ ~
      bernoulli(
        Phi_approx(
-        X_Q[R_1_ind] * alpha_p_tilde[,1] +
+        X_Q[R_1_ind,] * alpha_p_tilde[,1] +
         theta_0[R_1_ind,1] * gamma_p_[1] +
-        lambda[R_1_ind] * c_p[1] // +
-  //       lambda[,4] * c[4]
+        lambda[R_1_ind,1] * c_p[1]
        )
      );
 
@@ -991,8 +961,7 @@ model {
       Phi_approx(
         X_Q[R_2_ind,] * alpha_p_tilde[,2] +
         theta_1[R_2_ind,1] * gamma_p_[2] +
-        lambda[R_2_ind] * c_p[2] // +
-  //        lambda[R_2_ind,4] * c[4]
+        lambda[R_2_ind,1] * c_p[2]
         )
       );
 
@@ -1003,8 +972,7 @@ model {
       Phi_approx(
         X_Q[R_3_ind,] * alpha_p_tilde[,3] +
         theta_2[R_3_ind,1] * gamma_p_[3] + 
-        lambda[R_3_ind] * c_p[3] // +
-  //        lambda[R_3_ind,4] * c[4]
+       lambda[R_3_ind,1] * c_p[3]
       )
     );
 
@@ -1015,8 +983,7 @@ model {
       Phi_approx(
         X_Q[R_4_ind,] * alpha_p_tilde[,4] +
         theta_3[R_4_ind,1] * gamma_p_[4] + 
-        lambda[R_4_ind] * c_p[4] // +
-  //        lambda[R_4_ind,4] * c[4]
+        lambda[R_4_ind,1] * c_p[4]
         )
       );
     
@@ -1236,7 +1203,7 @@ generated quantities {
 
   //  matrix[X_num,anchor_num] alpha_anchor = X_R\alpha_anchor_tilde;
 
-//  corr_matrix[3] corr_lambda = tcrossprod(L_corr_lambda);
+ corr_matrix[3] corr_lambda = tcrossprod(L_corr_lambda);
 
   corr_matrix[2] corr_1 = tcrossprod(L_corr_1);
   corr_matrix[3] corr_2 = tcrossprod(L_corr_2);

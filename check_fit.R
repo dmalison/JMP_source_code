@@ -23,7 +23,7 @@ cbind(
 traceplot(fit_stan, pars = regex[sort(sample(1:length(regex), min(length(regex),9)))], inc_warmup = F)
 k = k + 1
 
-i = paste("alpha_2_tilde[",1:stan_data$X_num, ',3]', sep = "")
+i = paste("alpha_p_tilde[",1:stan_data$X_num, ',4]', sep = "")
 summary(fit_stan, pars = i, use_cache = F)[[1]][,c(1,6,4,8,9,10)]
 traceplot(fit_stan, pars = i, inc_warmup = F)
 

@@ -39,7 +39,6 @@ gen educ_cat_f = cf1edu  if cf1edu >= 0
 * Mother's race
 
 gen race_m = cm1ethrace if cm1ethrace >= 0
-replace race_m = 4 if race_m == .
 
 recode race_m (4 = 1) 
 // recode others as white because only <5% of sample
@@ -49,7 +48,6 @@ recode race_m (4 = 1)
 
 gen race_f = cf1ethrace if cf1ethrace >= 0
 
-replace race_f = 4 if race_f == .
 recode race_f (4 = 1)
 // recode others as white because only <5% of sample
 // 55% of the "others" group are Asian
