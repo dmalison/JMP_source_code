@@ -75,37 +75,59 @@ functions {
         }
   }
   
-  void draw_epsilon_lag1_mix_lp(
-    row_vector epsilon,
-    real p,
-    row_vector delta,
-    matrix L_corr
-  )
-  {
-    target += 
-    log_sum_exp(
-      log(1 - p) + multi_normal_cholesky_lpdf(epsilon | rep_row_vector(0,3), L_corr),
-      log(p) + multi_normal_cholesky_lpdf(epsilon | append_col(0,delta), L_corr)
-      );
-  }
-  
-  void draw_epsilon_lag2_mix_lp(
-    row_vector epsilon,
-    real p1,
-    real p2,
-    row_vector beta,
-    row_vector delta,
-    matrix L_corr
-  )
-  {
-    vector[3] log_probs;
-    log_probs[1] = log(1 - p1)           + multi_normal_cholesky_lpdf(epsilon | rep_row_vector(0,3), L_corr);
-    log_probs[2] = log(p1) + log(1 - p2) + multi_normal_cholesky_lpdf(epsilon | append_col(0,beta),  L_corr);
-    log_probs[3] = log(p1) + log(p2)     + multi_normal_cholesky_lpdf(epsilon | append_col(0,delta), L_corr);
-
-    target += log_sum_exp(log_probs);
-  }
+  void add_logit_outcome_lp(
+    int num, 
+    int[] I_num, 
+    int[] I_ind, 
+    int[] outcome,
+    matrix alpha,
+    matrix gamma,
+    vector[] c,
+    matrix theta,
+    matrix X
+    )
+    {
+    int pos = 1;
+      for (m in 1:num)
+      {
+        int ind[I_num[m]] = I_ind[pos:(pos + I_num[m] - 1)];
+        outcome[pos:(pos + I_num[m] - 1)] ~
+          bernoulli_logit(
+            c[m][1] + X[ind,]*alpha[,m] +
+              gamma[1,m]*theta[ind,2] + gamma[2,m]*theta[ind,3]
+          );
+        pos = pos + I_num[m];
+      }
+    }
     
+  void add_orderedLogit_outcome_lp(
+    int num, 
+    int[] I_num, 
+    int[] I_ind, 
+    int[] outcome,
+    matrix alpha,
+    matrix gamma,
+    vector[] c,
+    matrix theta,
+    matrix X
+    )
+    {
+      int pos = 1;
+        for (m in 1:num)
+        {
+          for (n in pos:(pos + I_num[m] - 1))
+          {
+            int ind = I_ind[n];
+            outcome[n] ~ 
+              ordered_logistic(
+                X[ind,]*alpha[,m] +
+                gamma[1,m]*theta[ind,2] + gamma[2,m]*theta[ind,3], 
+                c[m]
+                );
+          }
+          pos = pos + I_num[m];
+        }
+    }
 }
 data {
   
@@ -121,10 +143,10 @@ data {
   /*** measurements ***/
 
     /*
-       *_num: Number of measurements
-       I_*_num: Number of non-missing observations for each measurement
-       I_*_ind: Indices of non-missing observations for each measurement
-       M_*: measurements
+       *_num:   number of measurements
+       I_*_num: number of non-missing observations for each measurement
+       I_*_ind: indices of non-missing observations for each measurement
+       M_*:     measurement vector
     */
 
     /*** theta_R_0 ***/
@@ -248,7 +270,6 @@ data {
       *_ind0: Indicies of observations not in a relationship this period
       *_N1: Number of observations in a relationship this period
       *_ind1: Indicies of observations in a relationship this period
-      *_ind_nomiss: Indicies of observations that are non-missing this period
     */
 
     /*** R_0 ***/
@@ -280,10 +301,6 @@ data {
     int<lower = 0, upper = N> R_2_ind0[R_2_N0];
     int<lower = 0, upper = N> R_2_N1;
     int<lower = 0, upper = N> R_2_ind1[R_2_N1];
-    int<lower = 0, upper = N> R_2_N_nomiss;
-    int<lower = 0, upper = N> R_2_ind_nomiss[R_2_N_nomiss];
-    int<lower = 0, upper = N> R_2_N_miss;
-    int<lower = 0, upper = N> R_2_ind_miss[R_2_N_miss];
 
     /*** R_3 ***/
 
@@ -294,10 +311,6 @@ data {
     int<lower = 0, upper = N> R_3_ind0[R_3_N0];
     int<lower = 0, upper = N> R_3_N1;
     int<lower = 0, upper = N> R_3_ind1[R_3_N1];
-    int<lower = 0, upper = N> R_3_N_nomiss;
-    int<lower = 0, upper = N> R_3_ind_nomiss[R_3_N_nomiss];
-    int<lower = 0, upper = N> R_3_N_miss;
-    int<lower = 0, upper = N> R_3_ind_miss[R_3_N_miss];
 
     /*** R_4 ***/
     
@@ -308,7 +321,42 @@ data {
     int<lower = 0, upper = N> R_4_ind0[R_4_N0];
     int<lower = 0, upper = N> R_4_N1;
     int<lower = 0, upper = N> R_4_ind1[R_4_N1];
-    int<lower = 0, upper = N> R_4_ind_nomiss[R_4_N0 + R_4_N1];
+    
+    /*** R_5 ***/
+    
+    int<lower = 0, upper = N> R_5_N;
+    int<lower = 0, upper = N> R_5_ind[R_5_N];
+    int<lower = 0, upper = 1> R_5_[R_5_N];
+    int<lower = 0, upper = N> R_5_N0;
+    int<lower = 0, upper = N> R_5_ind0[R_5_N0];
+    int<lower = 0, upper = N> R_5_N1;
+    int<lower = 0, upper = N> R_5_ind1[R_5_N1];
+
+  /*** outcomes ***/
+  
+    /*** Year 9 ***/
+    
+    int<lower = 1> outcome_yr9_cat2_num;
+    int<lower = 1, upper = N> I_outcome_yr9_cat2_num[outcome_yr9_cat2_num];
+    int<lower = 1, upper = N> I_outcome_yr9_cat2_ind[sum(I_outcome_yr9_cat2_num)];
+    int<lower = 0, upper = 1> outcome_yr9_cat2[sum(I_outcome_yr9_cat2_num)];
+    
+    int<lower = 1> outcome_yr9_cat5_num;
+    int<lower = 1, upper = N> I_outcome_yr9_cat5_num[outcome_yr9_cat5_num];
+    int<lower = 1, upper = N> I_outcome_yr9_cat5_ind[sum(I_outcome_yr9_cat5_num)];
+    int<lower = 1, upper = 5> outcome_yr9_cat5[sum(I_outcome_yr9_cat5_num)];
+
+    /*** Year 15 ***/
+    
+    int<lower = 1> outcome_yr15_cat2_num;
+    int<lower = 1, upper = N> I_outcome_yr15_cat2_num[outcome_yr15_cat2_num];
+    int<lower = 1, upper = N> I_outcome_yr15_cat2_ind[sum(I_outcome_yr15_cat2_num)];
+    int<lower = 0, upper = 1> outcome_yr15_cat2[sum(I_outcome_yr15_cat2_num)];
+    
+    int<lower = 1> outcome_yr15_cat4_num;
+    int<lower = 1, upper = N> I_outcome_yr15_cat4_num[outcome_yr15_cat4_num];
+    int<lower = 1, upper = N> I_outcome_yr15_cat4_ind[sum(I_outcome_yr15_cat4_num)];
+    int<lower = 1, upper = 4> outcome_yr15_cat4[sum(I_outcome_yr15_cat4_num)];
 
   /*** measurement parameters ***/
   
@@ -386,13 +434,14 @@ transformed data {
   /*** declare relationship indicator vectors for full sample ***/
 
   // need to assign these because Stan can't read in NAs
-  // NAs set to 0 (integrated out of likelihood)
+  // NAs set to 0 (do not enter likelihood)
 
   vector[N] R_0 = rep_vector(0, N);
   vector[N] R_1 = rep_vector(0, N); 
   vector[N] R_2 = rep_vector(0, N);
   vector[N] R_3 = rep_vector(0, N);
   vector[N] R_4 = rep_vector(0, N);
+  vector[N] R_5 = rep_vector(0, N);
 
   /*** prior parameters ***/
 
@@ -423,6 +472,7 @@ transformed data {
     R_2[R_2_ind]  = to_vector(R_2_);
     R_3[R_3_ind]  = to_vector(R_3_);
     R_4[R_4_ind]  = to_vector(R_4_);
+    R_5[R_5_ind]  = to_vector(R_5_);
 
 }
 parameters {
@@ -503,14 +553,27 @@ parameters {
 
 /*** relationship indicators ***/
 
-  matrix[X_num,4] alpha_p_tilde;
-  vector[4] gamma_p_; // (extra undercore at end because gamma_p is a protected function)
-  vector[4] c_p;
+  matrix[X_num,5] alpha_p_tilde;
+  vector[5] gamma_p_; // (extra undercore at end because gamma_p is a protected function)
+  vector[5] c_p;
 
-/*** anchors ***/
+/*** outcomes ***/
   
-  // matrix[X_num, anchor_num] alpha_anchor_tilde; 
-  // matrix[2, anchor_num] gamma_anchor;
+  matrix[X_num, outcome_yr9_cat2_num]  alpha_outcome_yr9_cat2_tilde;
+  matrix[2,     outcome_yr9_cat2_num]  gamma_outcome_yr9_cat2;
+  vector[1]  c_outcome_yr9_cat2[outcome_yr9_cat2_num];
+  
+  matrix[X_num, outcome_yr9_cat5_num]  alpha_outcome_yr9_cat5_tilde;
+  matrix[2,     outcome_yr9_cat5_num]  gamma_outcome_yr9_cat5;
+  ordered[4] c_outcome_yr9_cat5[outcome_yr9_cat5_num];
+
+  matrix[X_num, outcome_yr15_cat2_num] alpha_outcome_yr15_cat2_tilde;
+  matrix[2,     outcome_yr15_cat2_num] gamma_outcome_yr15_cat2;
+  vector[1]  c_outcome_yr15_cat2[outcome_yr15_cat2_num];
+  
+  matrix[X_num, outcome_yr15_cat4_num] alpha_outcome_yr15_cat4_tilde;
+  matrix[2,     outcome_yr15_cat4_num] gamma_outcome_yr15_cat4;
+  ordered[3] c_outcome_yr15_cat4[outcome_yr15_cat4_num];
 
 }
 transformed parameters {
@@ -559,11 +622,8 @@ transformed parameters {
   matrix[N, 3] theta_2 = rep_matrix(0, N, 3);
   matrix[N, 3] theta_3 = rep_matrix(0, N, 3);
   matrix[N, 3] theta_4 = rep_matrix(0, N, 3);
-  
-/*** assign lambda ***/ 
-
- lambda = lambda_raw * L_corr_lambda' * diag_matrix(sigma_lambda);
-
+ 
+/*** assign transformed parameters ***/  
 {
   /*** declare and assign epsilons ***/ 
   
@@ -589,7 +649,8 @@ transformed parameters {
     epsilon_4[R_4_ind1,] = epsilon_4_R4eq1 * L_corr_4' * diag_matrix(sigma_4);
     epsilon_4[R_4_ind0,2:3] =
       epsilon_NC_4_R4eq0 * cholesky_decompose(tcrossprod(L_corr_4[2:3,])) * diag_matrix(sigma_4[2:3]);
-
+  /*** assign lambda ***/ 
+    lambda = lambda_raw * L_corr_lambda' * diag_matrix(sigma_lambda);
   /*** assign theta_0 ***/
   {
     vector[N] theta_R_0 = rep_vector(0,N);
@@ -904,10 +965,31 @@ model {
   L_corr_4    ~ lkj_corr_cholesky(lkj_eta_prior_3);
   sigma_4     ~ beta(1.5,1.5);
   
-  /*** anchors ***/
+  /*** outcomes ***/
   
-  // to_vector(alpha_anchor_tilde) ~ normal(normal_mu_prior, normal_sigma_prior);
-  // to_vector(gamma_anchor) ~ normal(normal_mu_prior, normal_sigma_prior);
+  to_vector(alpha_outcome_yr9_cat2_tilde) ~ normal(normal_mu_prior, normal_sigma_prior);
+  to_vector(gamma_outcome_yr9_cat2)       ~ normal(normal_mu_prior, normal_sigma_prior);
+  for (m in 1:outcome_yr9_cat2_num){
+    c_outcome_yr9_cat2[m] ~ normal(normal_mu_prior, normal_sigma_prior);
+  }
+
+  to_vector(alpha_outcome_yr9_cat5_tilde) ~ normal(normal_mu_prior, normal_sigma_prior);
+  to_vector(gamma_outcome_yr9_cat5)       ~ normal(normal_mu_prior, normal_sigma_prior);
+  for (m in 1:outcome_yr9_cat5_num){
+    c_outcome_yr9_cat5[m] ~ normal(normal_mu_prior, normal_sigma_prior);
+  }
+
+  to_vector(alpha_outcome_yr15_cat2_tilde) ~ normal(normal_mu_prior, normal_sigma_prior);
+  to_vector(gamma_outcome_yr15_cat2)       ~ normal(normal_mu_prior, normal_sigma_prior);
+  for (m in 1:outcome_yr15_cat2_num){
+    c_outcome_yr15_cat2[m] ~ normal(normal_mu_prior, normal_sigma_prior);
+  }
+
+  to_vector(alpha_outcome_yr15_cat4_tilde) ~ normal(normal_mu_prior, normal_sigma_prior);
+  to_vector(gamma_outcome_yr15_cat4)       ~ normal(normal_mu_prior, normal_sigma_prior);
+  for (m in 1:outcome_yr15_cat4_num){
+    c_outcome_yr15_cat4[m] ~ normal(normal_mu_prior, normal_sigma_prior);
+  }
 
 /*** state variables ***/
 
@@ -984,6 +1066,17 @@ model {
         X_Q[R_4_ind,] * alpha_p_tilde[,4] +
         theta_3[R_4_ind,1] * gamma_p_[4] + 
         lambda[R_4_ind,1] * c_p[4]
+        )
+      );
+    
+  /*** R_5 ***/
+    
+  R_5_ ~
+    bernoulli(
+      Phi_approx(
+        X_Q[R_5_ind,] * alpha_p_tilde[,5] +
+        theta_4[R_5_ind,1] * gamma_p_[5] + 
+        lambda[R_5_ind,1] * c_p[5]
         )
       );
     
@@ -1176,20 +1269,59 @@ model {
     theta_4[,3]
   )
   
-  /*** anchors ***/
-  // {
-  //   int pos = 1;
-  //   for (m in 1:anchor_num){
-  //     int ind[I_anchor_num[m]] = I_anchor_ind[pos:(pos + I_anchor_num[m] - 1)];
-  //     anchor[pos:(pos + I_anchor_num[m] - 1)] ~ 
-  //       bernoulli_logit(
-  //         X_Q[ind,] * alpha_anchor_tilde[,m] +
-  //           gamma_anchor[1,m]*theta_4[ind,2] + gamma_anchor[2,m]*theta_4[ind,3]
-  //       )
-  //     ;
-  //     pos = pos + I_anchor_num[m];
-  //   }
-  // } 
+/*** outcomes ***/
+  
+  /*** Year 9 ***/
+  
+  add_logit_outcome_lp(
+    outcome_yr9_cat2_num, 
+    I_outcome_yr9_cat2_num, 
+    I_outcome_yr9_cat2_ind, 
+    outcome_yr9_cat2,
+    alpha_outcome_yr9_cat2_tilde,
+    gamma_outcome_yr9_cat2,
+    c_outcome_yr9_cat2,
+    theta_4,
+    X_Q
+    )
+    
+  add_orderedLogit_outcome_lp(
+    outcome_yr9_cat5_num, 
+    I_outcome_yr9_cat5_num, 
+    I_outcome_yr9_cat5_ind, 
+    outcome_yr9_cat5,
+    alpha_outcome_yr9_cat5_tilde,
+    gamma_outcome_yr9_cat5,
+    c_outcome_yr9_cat5,
+    theta_4,
+    X_Q
+    )
+    
+  /*** Year 15 ***/  
+  
+  add_logit_outcome_lp(
+    outcome_yr15_cat2_num, 
+    I_outcome_yr15_cat2_num, 
+    I_outcome_yr15_cat2_ind, 
+    outcome_yr15_cat2,
+    alpha_outcome_yr15_cat2_tilde,
+    gamma_outcome_yr15_cat2,
+    c_outcome_yr15_cat2,
+    theta_4,
+    X_Q
+    )
+    
+  add_orderedLogit_outcome_lp(
+    outcome_yr15_cat4_num, 
+    I_outcome_yr15_cat4_num, 
+    I_outcome_yr15_cat4_ind, 
+    outcome_yr15_cat4,
+    alpha_outcome_yr15_cat4_tilde,
+    gamma_outcome_yr15_cat4,
+    c_outcome_yr15_cat4,
+    theta_4,
+    X_Q
+    )
 
 }
 generated quantities {
@@ -1199,12 +1331,14 @@ generated quantities {
   matrix[X_num,3] alpha_2 = X_R\alpha_2_tilde;
   matrix[X_num,3] alpha_3 = X_R\alpha_3_tilde;
   matrix[X_num,3] alpha_4 = X_R\alpha_4_tilde;
-  matrix[X_num,4] alpha_p = X_R\alpha_p_tilde;
+  matrix[X_num,5] alpha_p = X_R\alpha_p_tilde;
 
-  //  matrix[X_num,anchor_num] alpha_anchor = X_R\alpha_anchor_tilde;
+  matrix[X_num, outcome_yr9_cat2_num]  alpha_outcome_yr9_cat2  = X_R\alpha_outcome_yr9_cat2_tilde;
+  matrix[X_num, outcome_yr9_cat5_num]  alpha_outcome_yr9_cat5  = X_R\alpha_outcome_yr9_cat5_tilde;
+  matrix[X_num, outcome_yr15_cat2_num] alpha_outcome_yr15_cat2 = X_R\alpha_outcome_yr15_cat2_tilde;
+  matrix[X_num, outcome_yr15_cat4_num] alpha_outcome_yr15_cat4 = X_R\alpha_outcome_yr15_cat4_tilde;
 
- corr_matrix[3] corr_lambda = tcrossprod(L_corr_lambda);
-
+  corr_matrix[3] corr_lambda = tcrossprod(L_corr_lambda);
   corr_matrix[2] corr_1 = tcrossprod(L_corr_1);
   corr_matrix[3] corr_2 = tcrossprod(L_corr_2);
   corr_matrix[3] corr_3 = tcrossprod(L_corr_3);

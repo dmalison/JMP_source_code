@@ -20,25 +20,33 @@ N <- nrow(data_raw) # number of observations
 # Construct covariate matrix ---------------------------------------------
 
 # Covariate list
-covariates <- c("educ_cat_m",     # Mother's education at baseline
-                "race_m",         # Mother's race
-                "birthage_m",     # Mother's age at baseline
-                "educ_cat_f",     # Father's education at baseline
-                "race_f",         # Father's race at baseline
-                "rellength",      # How long parents knew each other at baseline
-                "siblings",       # Indicator for whether mother and father have other children together
-                "half_siblings",  # Indicator for whether mother or father have children with other partners
-                "female",         # Child gender
-                "religious_m"    # How often mother attends religious services
-)
+covariates <- 
+  c(
+    "educ_cat_m",     # Mother's education at baseline
+    "race_m",         # Mother's race
+    "birthage_m",     # Mother's age at baseline
+    "educ_cat_f",     # Father's education at baseline
+    "race_f",         # Father's race at baseline
+    "rellength",      # How long parents knew each other at baseline
+    "siblings",       # Indicator for whether mother and father have other children together
+    "half_siblings",  # Indicator for whether mother or father have children with other partners
+    "female",         # Child gender
+    "religious_m"     # How often mother attends religious services
+  )
 
 # Turn discrete variables into factors so that it is easy to make design matrix with lm
 
-for (var in c("educ_cat_m", 
-              "race_m",
-              "educ_cat_f",
-              "race_f", 
-              "religious_m")){
+for
+(
+  var in 
+  c(
+    "educ_cat_m", 
+    "race_m",
+    "educ_cat_f",
+    "race_f", 
+    "religious_m"
+  )
+){
   data_raw[[var]] <- factor(data_raw[[var]]) 
   rm(var)
 } 

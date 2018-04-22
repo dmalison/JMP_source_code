@@ -52,7 +52,13 @@ rm(covariates, ols)
 
 # Turn X into numeric so that it can be loaded into stan
 X <- matrix(as.numeric(X), nrow = dim(X)[1], ncol = dim(X)[2], dimnames = list(NULL, colnames(X)))
+
+# Take out column means
+X <- X - rep(colMeans(X), each = N)
+X <- X[,-1]
+
 X_num <- ncol(X)
+
 
 # Extract measurements ---------------------------------------------------
 
@@ -93,7 +99,28 @@ for (i in 1:nrow(mFrame)) mExtract(mFrame[i,])
 
 source("rExtract.R")
 
-for (i in 0:4) rExtract(i)
+for (i in 0:5) rExtract(i)
+
+# Extract outcomes ---------------------------------------------------
+
+outcomeData <- # contains year and number of categories for all outcomes
+  data.frame(
+    year = 
+      c(
+        9,9,
+        15,15
+      ),
+    n_cat = 
+      c(
+        2,5,
+        2,4
+      ),
+    stringsAsFactors = F
+  )
+
+source("outcomeExtract.R")
+
+for (i in 1:nrow(outcomeData)) outcomeExtract(outcomeData[i,])
 
 # Get measurement parameters --------------------------------------------------------
 
@@ -112,9 +139,12 @@ list2env(measurementPars, globalenv())
       "alpha_2", "beta_2", "delta_2", "gamma_2", "xi_2", "corr_2", "sigma_2",  
       "alpha_3", "beta_3", "delta_3", "gamma_3", "xi_3", "corr_3", "sigma_3",  
       "alpha_4", "beta_4", "delta_4", "gamma_4", "xi_4", "corr_4", "sigma_4",  
-      "alpha_p", "gamma_p_", "c_p"
-      # "alpha_anchor", "gamma_anchor"
-    )
+      "alpha_p", "gamma_p_", "c_p",
+      "alpha_outcome_yr9_cat2", "gamma_outcome_yr9_cat2", "c_outcome_yr9_cat2",
+      "alpha_outcome_yr9_cat5", "gamma_outcome_yr9_cat5", "c_outcome_yr9_cat5",
+      "alpha_outcome_yr15_cat2", "gamma_outcome_yr15_cat2", "c_outcome_yr15_cat2",
+      "alpha_outcome_yr15_cat4", "gamma_outcome_yr15_cat4", "c_outcome_yr15_cat4"
+      )
 }
 # stan_data: list of objects used by stan program
 {
@@ -146,12 +176,16 @@ list2env(measurementPars, globalenv())
          "R_4_cat5_num", "I_R_4_cat5_num", "I_R_4_cat5_ind", "M_R_4_cat5",   
          "N_4_cat3_num", "I_N_4_cat3_num", "I_N_4_cat3_ind", "M_N_4_cat3",
          "C_4_num", "I_C_4_num", "I_C_4_ind", "M_C_4",
-         #         "anchor_num", "I_anchor_num", "I_anchor_ind", "anchor", 
-         "R_0_N", "R_0_ind", "R_0_", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1", "R_0_N_nomiss", "R_0_ind_nomiss", "R_0_ind_miss", "R_0_N_miss",
-         "R_1_N", "R_1_ind", "R_1_", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1", "R_1_N_nomiss", "R_1_ind_nomiss", "R_1_ind_miss", "R_1_N_miss",
-         "R_2_N", "R_2_ind", "R_2_", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1", "R_2_N_nomiss", "R_2_ind_nomiss", "R_2_ind_miss", "R_2_N_miss",
-         "R_3_N", "R_3_ind", "R_3_", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1", "R_3_N_nomiss", "R_3_ind_nomiss", "R_3_ind_miss", "R_3_N_miss",
-         "R_4_N", "R_4_ind", "R_4_", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1", "R_4_N_nomiss", "R_4_ind_nomiss", "R_4_ind_miss", "R_4_N_miss",
+         "R_0_N", "R_0_ind", "R_0_", "R_0_N0", "R_0_ind0", "R_0_N1", "R_0_ind1", 
+         "R_1_N", "R_1_ind", "R_1_", "R_1_N0", "R_1_ind0", "R_1_N1", "R_1_ind1", 
+         "R_2_N", "R_2_ind", "R_2_", "R_2_N0", "R_2_ind0", "R_2_N1", "R_2_ind1", 
+         "R_3_N", "R_3_ind", "R_3_", "R_3_N0", "R_3_ind0", "R_3_N1", "R_3_ind1", 
+         "R_4_N", "R_4_ind", "R_4_", "R_4_N0", "R_4_ind0", "R_4_N1", "R_4_ind1", 
+         "R_5_N", "R_5_ind", "R_5_", "R_5_N0", "R_5_ind0", "R_5_N1", "R_5_ind1", 
+         "outcome_yr9_cat2_num", "I_outcome_yr9_cat2_num", "I_outcome_yr9_cat2_ind", "outcome_yr9_cat2",
+         "outcome_yr9_cat5_num", "I_outcome_yr9_cat5_num", "I_outcome_yr9_cat5_ind", "outcome_yr9_cat5",
+         "outcome_yr15_cat2_num", "I_outcome_yr15_cat2_num", "I_outcome_yr15_cat2_ind", "outcome_yr15_cat2",
+         "outcome_yr15_cat4_num", "I_outcome_yr15_cat4_num", "I_outcome_yr15_cat4_ind", "outcome_yr15_cat4",
          "gamma_M_R_0_cat3", "c_M_R_0_cat3",
          "gamma_M_R_1_cat3", "c_M_R_1_cat3",
          "gamma_M_R_1_cat5", "c_M_R_1_cat5",
@@ -197,14 +231,14 @@ fit_stan = stan(
            "alpha_4_tilde",
            "alpha_p_tilde"
   ),
-  # chains = 1,
-  # iter = 10,
-  # warmup = 5,
-  # refresh = 1,
-  chains = 8,
-  iter = 1625,
-  warmup = 1000,
-  refresh = 10,
+  chains = 1,
+  iter = 10,
+  warmup = 5,
+  refresh = 1,
+  # chains = 8,
+  # iter = 1625,
+  # warmup = 1000,
+  # refresh = 10,
   save_warmup = F,
   init_r = .5,
   control = list(max_treedepth = 12, adapt_delta = .8)
