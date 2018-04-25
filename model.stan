@@ -494,7 +494,7 @@ parameters {
 
   matrix[X_num,2] alpha_1_tilde;
   row_vector[1] beta_1_;
-  real<lower = 0> gamma_1_11_;
+  real gamma_1_11_;
   row_vector[1] gamma_1_;
   row_vector[1] xi_1_;
   row_vector[1] delta_1_;
@@ -508,8 +508,8 @@ parameters {
 
   matrix[X_num,3] alpha_2_tilde;
   row_vector[2] beta_2_;
-  real<lower = 0> gamma_2_11_;
-  real<lower = 0> gamma_2_22_;
+  real gamma_2_11_;
+  real gamma_2_22_;
   row_vector[3] gamma_2_;
   row_vector[2] delta_2_;
   row_vector[2] xi_2_;
@@ -523,9 +523,9 @@ parameters {
 
   matrix[X_num,3] alpha_3_tilde;
   row_vector[2] beta_3_;
-  real<lower = 0> gamma_3_11_;
-  real<lower = 0> gamma_3_22_;
-  real<lower = 0> gamma_3_33_;
+  real gamma_3_11_;
+  real gamma_3_22_;
+  real gamma_3_33_;
   row_vector[4] gamma_3_;
   row_vector[2] delta_3_;
   row_vector[2] xi_3_;
@@ -539,9 +539,9 @@ parameters {
 
   matrix[X_num,3] alpha_4_tilde;
   row_vector[2] beta_4_;
-  real<lower = 0> gamma_4_11_;
-  real<lower = 0> gamma_4_22_;
-  real<lower = 0> gamma_4_33_;
+  real gamma_4_11_;
+  real gamma_4_22_;
+  real gamma_4_33_;
   row_vector[4] gamma_4_;
   row_vector[2] delta_4_;
   row_vector[2] xi_4_;
@@ -555,7 +555,7 @@ parameters {
 
   matrix[X_num,5] alpha_p_tilde;
   vector[5] gamma_p_; // (extra undercore at end because gamma_p is a protected function)
-  vector[5] c_p;
+  vector<lower = 0>[5] c_p;
 
 /*** outcomes ***/
   
@@ -902,13 +902,13 @@ model {
    to_vector(alpha_p_tilde)
      ~ normal(normal_mu_prior, normal_sigma_prior);
     gamma_p_ ~ normal(normal_mu_prior, normal_sigma_prior);
-    c_p ~ normal(normal_mu_prior, normal_sigma_prior);
+    c_p ~ gamma(2,1);
 
   /*** theta_0 ***/
   
   to_vector(alpha_0_tilde)
            ~ normal(normal_mu_prior, normal_sigma_prior);
-  sigma_0  ~ beta(6,1.5);
+  sigma_0  ~ beta(3,1.5);
 
   /*** theta_1 ***/
   
@@ -916,7 +916,7 @@ model {
               ~ normal(normal_mu_prior, normal_sigma_prior);
   beta_1_     ~ normal(normal_mu_prior, normal_sigma_prior);
   gamma_1_    ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_1_11_ ~ gamma(2,2);
+  gamma_1_11_ ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_1_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_1_       ~ normal(normal_mu_prior, normal_sigma_prior);
   L_corr_1    ~ lkj_corr_cholesky(lkj_eta_prior_2);
@@ -929,8 +929,8 @@ model {
               ~ normal(normal_mu_prior, normal_sigma_prior);
   beta_2_     ~ normal(normal_mu_prior, normal_sigma_prior);
   gamma_2_    ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_2_11_ ~ gamma(1.5,1.5);
-  gamma_2_22_ ~ gamma(1.5,1.5);
+  gamma_2_11_ ~ normal(normal_mu_prior, normal_sigma_prior);
+  gamma_2_22_ ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_2_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_2_       ~ normal(normal_mu_prior, normal_sigma_prior);
   L_corr_2    ~ lkj_corr_cholesky(lkj_eta_prior_3);
@@ -943,9 +943,9 @@ model {
               ~ normal(normal_mu_prior, normal_sigma_prior);
   beta_3_     ~ normal(normal_mu_prior, normal_sigma_prior);
   gamma_3_    ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_3_11_ ~ gamma(1.5,1.5);
-  gamma_3_22_ ~ gamma(1.5,1.5);
-  gamma_3_33_ ~ gamma(1.5,1.5);
+  gamma_3_11_ ~ normal(normal_mu_prior, normal_sigma_prior);
+  gamma_3_22_ ~ normal(normal_mu_prior, normal_sigma_prior);
+  gamma_3_33_ ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_3_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_3_       ~ normal(normal_mu_prior, normal_sigma_prior);
   L_corr_3    ~ lkj_corr_cholesky(lkj_eta_prior_3);
@@ -957,9 +957,9 @@ model {
               ~ normal(normal_mu_prior, normal_sigma_prior);
   beta_4_     ~ normal(normal_mu_prior, normal_sigma_prior);
   gamma_4_    ~ normal(normal_mu_prior, normal_sigma_prior);
-  gamma_4_11_ ~ gamma(1.5,1.5);
-  gamma_4_22_ ~ gamma(1.5,1.5);
-  gamma_4_33_ ~ gamma(1.5,1.5);
+  gamma_4_11_ ~ normal(normal_mu_prior, normal_sigma_prior);
+  gamma_4_22_ ~ normal(normal_mu_prior, normal_sigma_prior);
+  gamma_4_33_ ~ normal(normal_mu_prior, normal_sigma_prior);
   delta_4_    ~ normal(normal_mu_prior, normal_sigma_prior);
   xi_4_       ~ normal(normal_mu_prior, normal_sigma_prior);
   L_corr_4    ~ lkj_corr_cholesky(lkj_eta_prior_3);

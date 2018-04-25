@@ -49,7 +49,11 @@ theta_2 = colMeans(extract(fit_stan, pars = "theta_2")[[1]])
 theta_3 = colMeans(extract(fit_stan, pars = "theta_3")[[1]])
 plot(theta_2[,2], data_raw$theta_N_2)
 
-theta_C_4 = colMeans(extract(fit_stan, pars = "theta_C_4")[[1]])
+lambda = extract(fit_stan, pars = "lambda")[[1]]
+
+traceplot(fit_stan, pars = paste("lambda[", sample(stan_data$N,9), ",1]", sep = ""))
+
+hist(lambda[,5,1])
 
 plot(theta_C_4, data_raw$theta_C_4)
 ind = which(data_raw$R_2 == 1)
